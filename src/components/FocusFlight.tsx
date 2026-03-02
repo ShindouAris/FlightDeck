@@ -1,7 +1,7 @@
 import { Map } from "@/components/ui/map/map";
 import { Card } from "./ui/card";
 import { useEffect, useState } from "react";
-import { MapMarker, MarkerContent } from "./ui/map/marker";
+import { AirportMarkers } from "./AirportMarkers";
 
 const MAPBOX_ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 const HAS_MAPBOX_TOKEN = Boolean(MAPBOX_ACCESS_TOKEN);
@@ -14,6 +14,7 @@ const FALLBACK_STYLES = {
 interface Airport {
     name: string
     ident: string
+    iata_code: string
     id: number
     lat: number
     long: number
@@ -26,7 +27,7 @@ export function FocusFlight() {
     useEffect(() => {
         const fetchAirports = async () => {
             try {
-                const response = await fetch("/airports_small.json")
+                const response = await fetch("/airports.json")
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`)
                 }
@@ -36,7 +37,7 @@ export function FocusFlight() {
                 console.error("Failed to fetch airports:", error)
             }
         }
-        // fetchAirports()
+        fetchAirports() // Perf nuke, temporarily disable
     }, [])
 
   return (
@@ -50,13 +51,7 @@ export function FocusFlight() {
             zoom={12} 
             showLoader={false}
         >
-            {airports.map((airport) => (
-                <MapMarker key={airport.id} coordinates={[airport.long, airport.lat]}>
-                    <MarkerContent>
-                        
-                    </MarkerContent>
-                </MapMarker>
-            ))}
+            <AirportMarkers airports={airports} minZoom={6} maxMarkers={500} />
         </Map>
     </Card>
 
