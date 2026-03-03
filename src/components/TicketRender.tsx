@@ -1,6 +1,7 @@
 import { LuPlane } from "react-icons/lu";
 import DottedMap from "dotted-map";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface BoardingTicketProps {
   iataDeparture: string;
@@ -12,6 +13,7 @@ interface BoardingTicketProps {
   timefocus: number;
   flightNo?: string;
   date?: string;
+  onTorn?: () => void;
 }
 
 /** Generates a pseudo-random barcode SVG from a seed string */
@@ -46,9 +48,12 @@ export const BoardingTicket: React.FC<BoardingTicketProps> = ({
   seat,
   distance,
   timefocus,
-  flightNo = "CM0001",
+  flightNo = "ARS367",
   date,
+  onTorn,
 }) => {
+  const [torn, setTorn] = useState(false);
+
   const map = useMemo(() => {
     const m = new DottedMap({ height: 100, grid: "diagonal" });
     return m.getSVG({
@@ -72,102 +77,157 @@ export const BoardingTicket: React.FC<BoardingTicketProps> = ({
       ? `${Math.floor(timefocus / 60)}h${timefocus % 60 ? `${timefocus % 60}m` : ""}`
       : `${timefocus}m`;
 
+  const handleTear = () => {
+    if (!torn) setTorn(true);
+  };
+
   return (
-    <div className="w-85 rounded-[28px] bg-[#1c1c28] shadow-2xl shadow-black/60 overflow-hidden select-none">
-      <div className="relative h-36 overflow-hidden">
-        <img
-          src={`data:image/svg+xml;utf8,${encodeURIComponent(map)}`}
-          className="absolute inset-0 w-full h-full object-cover scale-150 opacity-60"
-          alt="world map"
-          draggable={false}
-        />
-        <div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-[#1c1c28] via-[#1c1c28]/80 to-transparent" />
+    <div
+      className="relative w-85 select-none cursor-pointer"
+      onClick={handleTear}
+      title={torn ? "" : "Click to tear"}
+    >
+      {/* ══════════ TOP HALF — main ticket body ══════════ */}
+      <motion.div
+        className="relative bg-[#1c1c28] rounded-t-[28px] overflow-hidden shadow-2xl shadow-black/60"
+        animate={
+          torn
+            ? { y: -8, transition: { type: "spring", stiffness: 300, damping: 20 } }
+            : { y: 0 }
+        }
+      >
+        {/* Map background */}
+        <div className="relative h-36 overflow-hidden">
+          <img
+            src={`data:image/svg+xml;utf8,${encodeURIComponent(map)}`}
+            className="absolute inset-0 w-full h-full object-cover scale-150 opacity-60"
+            alt="world map"
+            draggable={false}
+          />
+          <div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-[#1c1c28] via-[#1c1c28]/80 to-transparent" />
 
-        <div className="relative z-10 flex items-start justify-between px-7 pt-7">
-          <div className="flex flex-col gap-0.5">
-            <span className="text-white text-3xl font-extrabold tracking-wide leading-none">
-              {iataDeparture}
-            </span>
-            <span className="text-gray-400 text-[11px] tracking-wide">
-              {departure}
-            </span>
-          </div>
+          {/* IATA codes */}
+          <div className="relative z-10 flex items-start justify-between px-7 pt-7">
+            <div className="flex flex-col gap-0.5">
+              <span className="text-white text-3xl font-extrabold tracking-wide leading-none">
+                {iataDeparture}
+              </span>
+              <span className="text-gray-400 text-[11px] tracking-wide">
+                {departure}
+              </span>
+            </div>
 
-          <div className="flex flex-col items-center gap-1 pt-1">
-            <span className="text-gray-500 text-[11px] font-medium tracking-wider">
-              {durationLabel}
-            </span>
-            <div className="flex items-center gap-1 w-20">
-              <div className="flex-1 border-t border-dashed border-gray-600" />
-              <LuPlane className="text-gray-400 text-sm rotate-0" />
-              <div className="flex-1 border-t border-dashed border-gray-600" />
+            <div className="flex flex-col items-center gap-1 pt-1">
+              <span className="text-gray-500 text-[11px] font-medium tracking-wider">
+                {durationLabel}
+              </span>
+              <div className="flex items-center gap-1 w-20">
+                <div className="flex-1 border-t border-dashed border-gray-600" />
+                <LuPlane className="text-gray-400 text-sm rotate-0" />
+                <div className="flex-1 border-t border-dashed border-gray-600" />
+              </div>
+            </div>
+
+            <div className="flex flex-col items-end gap-0.5">
+              <span className="text-white text-3xl font-extrabold tracking-wide leading-none">
+                {iataArrival}
+              </span>
+              <span className="text-gray-400 text-[11px] tracking-wide">
+                {arrival}
+              </span>
             </div>
           </div>
+        </div>
 
-          <div className="flex flex-col items-end gap-0.5">
-            <span className="text-white text-3xl font-extrabold tracking-wide leading-none">
-              {iataArrival}
+        {/* Info grid */}
+        <div className="relative z-10 px-7 pb-2 pt-1 grid grid-cols-2 gap-y-3.5">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-gray-500 text-[10px] uppercase tracking-widest">
+              Flight No.
             </span>
-            <span className="text-gray-400 text-[11px] tracking-wide">
-              {arrival}
+            <span className="text-white text-sm font-bold tracking-wide">
+              {flightNo}
+            </span>
+          </div>
+          <div className="flex flex-col items-end gap-0.5">
+            <span className="text-gray-500 text-[10px] uppercase tracking-widest">
+              Distance
+            </span>
+            <span className="text-white text-sm font-bold tracking-wide">
+              {distance}
+              <span className="text-gray-400 font-normal ml-1 text-xs">km</span>
+            </span>
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <span className="text-gray-500 text-[10px] uppercase tracking-widest">
+              Seat
+            </span>
+            <span className="text-white text-sm font-bold tracking-wide">
+              {seat}
+            </span>
+          </div>
+          <div className="flex flex-col items-end gap-0.5">
+            <span className="text-gray-500 text-[10px] uppercase tracking-widest">
+              Date
+            </span>
+            <span className="text-white text-sm font-bold tracking-wide">
+              {displayDate}
             </span>
           </div>
         </div>
-      </div>
 
-      <div className="relative z-10 px-7 pb-2 pt-1 grid grid-cols-2 gap-y-3.5">
-        <div className="flex flex-col gap-0.5">
-          <span className="text-gray-500 text-[10px] uppercase tracking-widest">
-            Flight No.
-          </span>
-          <span className="text-white text-sm font-bold tracking-wide">
-            {flightNo}
-          </span>
+        {/* Bottom notch (top half of tear line) */}
+        <div className="relative flex items-end">
+          <div className="w-4 h-4 bg-black rounded-tr-full -ml-px" />
+          <div className="flex-1 border-b border-dashed border-gray-600/50 mx-1 mb-0" />
+          <div className="w-4 h-4 bg-black rounded-tl-full -mr-px" />
         </div>
-        <div className="flex flex-col items-end gap-0.5">
-          <span className="text-gray-500 text-[10px] uppercase tracking-widest">
-            Distance
-          </span>
-          <span className="text-white text-sm font-bold tracking-wide">
-            {distance}
-            <span className="text-gray-400 font-normal ml-1 text-xs">km</span>
-          </span>
-        </div>
-        <div className="flex flex-col gap-0.5">
-          <span className="text-gray-500 text-[10px] uppercase tracking-widest">
-            Seat
-          </span>
-          <span className="text-white text-sm font-bold tracking-wide">
-            {seat}
-          </span>
-        </div>
-        <div className="flex flex-col items-end gap-0.5">
-          <span className="text-gray-500 text-[10px] uppercase tracking-widest">
-            Date
-          </span>
-          <span className="text-white text-sm font-bold tracking-wide">
-            {displayDate}
-          </span>
-        </div>
-      </div>
+      </motion.div>
 
-      <div className="relative my-3 mx-0 flex items-center">
-        <div className="w-4 h-8 bg-black rounded-r-full -ml-px" />
-        <div className="flex-1 border-t border-dashed border-gray-600/50 mx-1" />
-        <div className="w-4 h-8 bg-black rounded-l-full -mr-px" />
-      </div>
+      {/* ══════════ BOTTOM HALF — barcode stub ══════════ */}
+      <motion.div
+        className="relative bg-[#1c1c28] rounded-b-[28px] overflow-hidden shadow-2xl shadow-black/60"
+        style={{ transformOrigin: "top left" }}
+        animate={
+          torn
+            ? {
+                y: 30,
+                x: 12,
+                rotate: 4,
+                opacity: 0.7,
+                transition: {
+                  type: "spring",
+                  stiffness: 200,
+                  damping: 18,
+                  delay: 0.05,
+                },
+              }
+            : { y: 0, x: 0, rotate: 0, opacity: 1 }
+        }
+        onAnimationComplete={() => {
+          if (torn && onTorn) onTorn();
+        }}
+      >
+        {/* Top notch (bottom half of tear line) */}
+        <div className="relative flex items-start">
+          <div className="w-4 h-4 bg-black rounded-br-full -ml-px" />
+          <div className="flex-1" />
+          <div className="w-4 h-4 bg-black rounded-bl-full -mr-px" />
+        </div>
 
-      <div className="px-8 pb-7 pt-1 flex flex-col items-center gap-2">
-        <img
-          src={`data:image/svg+xml;utf8,${encodeURIComponent(barcodeSvg)}`}
-          className="w-full h-12 opacity-80"
-          alt="barcode"
-          draggable={false}
-        />
-        <span className="text-gray-500 text-[10px] tracking-[0.25em] font-mono">
-          {iataDeparture}-{iataArrival}-{flightNo}
-        </span>
-      </div>
+        {/* Barcode */}
+        <div className="px-8 pb-7 pt-2 flex flex-col items-center gap-2">
+          <img
+            src={`data:image/svg+xml;utf8,${encodeURIComponent(barcodeSvg)}`}
+            className="w-full h-12 opacity-80"
+            alt="barcode"
+            draggable={false}
+          />
+          <span className="text-gray-500 text-[10px] tracking-[0.25em] font-mono">
+            {iataDeparture}-{iataArrival}-{flightNo}
+          </span>
+        </div>
+      </motion.div>
     </div>
   );
 };
