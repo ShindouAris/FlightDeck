@@ -7,7 +7,8 @@ keep_fields = {
     "name",
     "latitude_deg",
     "longitude_deg",
-    "iata_code"
+    "iata_code",
+    "municipality"
 }
 
 result = []
