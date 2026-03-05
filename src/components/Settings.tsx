@@ -62,8 +62,7 @@ const categories: SettingCategory[] = [
 
 function Toggle({ enabled, onToggle }: { enabled: boolean; onToggle: () => void }) {
   return (
-    <Switch checked={enabled} onCheckedChange={onToggle}>
-    </Switch>
+    <Switch checked={enabled} onCheckedChange={onToggle} />
   );
 }
 
@@ -543,8 +542,10 @@ export function Setting() {
               <div className="sticky top-0 z-10 backdrop-blur-xl" style={{ backgroundColor: "var(--ff-overlay)" }}>
               <div className="flex items-center gap-3 px-4 pt-14 pb-4">
                 <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={handleBack}
-                  className="w-9 h-9 rounded-xl flex items-center justify-center transition-colors cursor-pointer"
+                  className="rounded-xl shrink-0"
                 >
                   <ChevronLeft size={18} className="text-white/60" />
                 </Button>
