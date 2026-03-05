@@ -294,6 +294,7 @@ export function FocusFlight() {
             <button
                 className="px-3 py-1 rounded bg-gray-200 text-slate-700"
                 onClick={handleToggleTimerDialog}
+                disabled={isPlaying}
             >
                 {isTimerDialogOpen ? "Close Timer" : "Set Timer"}
             </button>
