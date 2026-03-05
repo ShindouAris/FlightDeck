@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Settings,
@@ -82,12 +83,12 @@ function SettingRow({
   return (
     <div className="flex items-center justify-between py-4 px-1 group">
       <div className="flex items-center gap-4 min-w-0">
-        <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: "#1E1E22" }}>
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: "var(--ff-surface-raised)" }}>
           <Icon size={18} className="text-[#A78BFA]" />
         </div>
         <div className="min-w-0">
-          <p className="text-sm font-medium text-white/90">{label}</p>
-          {description && <p className="text-xs text-white/40 mt-0.5 truncate">{description}</p>}
+          <p className="text-sm font-medium text-gray-900/88 dark:text-white/90">{label}</p>
+          {description && <p className="text-xs text-gray-900/45 dark:text-white/40 mt-0.5 truncate">{description}</p>}
         </div>
       </div>
       {trailing && <div className="shrink-0 ml-4">{trailing}</div>}
@@ -96,12 +97,12 @@ function SettingRow({
 }
 
 function Divider() {
-  return <div className="h-px w-full" style={{ backgroundColor: "#ffffff08" }} />;
+  return <div className="h-px w-full" style={{ backgroundColor: "var(--ff-border)" }} />;
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-white/30 mb-3 mt-6 px-1">
+    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-900/40 dark:text-white/30 mb-3 mt-6 px-1">
       {children}
     </p>
   );
@@ -127,7 +128,8 @@ function GeneralContent() {
 }
 
 function AppearanceContent() {
-  const [theme, setTheme] = useState<"dark" | "light" | "system">("dark");
+  const { theme: rawTheme, setTheme } = useTheme();
+  const theme = (rawTheme ?? "dark") as "dark" | "light" | "system";
   return (
     <div>
       <SectionTitle>Theme</SectionTitle>
@@ -142,13 +144,13 @@ function AppearanceContent() {
             onClick={() => setTheme(key)}
             className="relative flex flex-col items-center gap-2 py-5 rounded-2xl border transition-all duration-300 cursor-pointer"
             style={{
-              backgroundColor: theme === key ? "#8B5CF610" : "#141416",
-              borderColor: theme === key ? "#8B5CF6" : "#ffffff08",
+              backgroundColor: theme === key ? "#8B5CF610" : "var(--ff-surface-mid)",
+              borderColor: theme === key ? "#8B5CF6" : "var(--ff-border)",
               boxShadow: theme === key ? "0 0 24px #8B5CF620, inset 0 1px 0 #8B5CF618" : "none",
             }}
           >
-            <ThIcon size={22} style={{ color: theme === key ? "#A78BFA" : "#ffffff40" }} />
-            <span className="text-xs font-medium" style={{ color: theme === key ? "#C4B5FD" : "#ffffff50" }}>{label}</span>
+            <ThIcon size={22} style={{ color: theme === key ? "#A78BFA" : "var(--ff-icon-muted)" }} />
+            <span className="text-xs font-medium" style={{ color: theme === key ? "#C4B5FD" : "var(--ff-label-inactive)" }}>{label}</span>
             {theme === key && (
               <motion.div layoutId="theme-indicator" className="absolute -bottom-px left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full bg-[#8B5CF6]" />
             )}
@@ -315,11 +317,11 @@ function EmptyState() {
       >
         <div className="relative">
           <div className="absolute inset-0 blur-3xl rounded-full" style={{ background: "radial-gradient(circle, #8B5CF618 0%, transparent 70%)" }} />
-          <Settings size={72} className="text-white/6 relative" strokeWidth={1} />
+          <Settings size={72} className="text-gray-900/10 dark:text-white/6 relative" strokeWidth={1} />
         </div>
       </motion.div>
       <motion.p
-        className="text-sm text-white/20 mt-6 font-medium tracking-wide"
+        className="text-sm text-gray-900/30 dark:text-white/20 mt-6 font-medium tracking-wide"
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15, duration: 0.4 }}
@@ -347,7 +349,7 @@ function SidebarItem({
       onClick={onClick}
       className="relative w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left transition-all duration-200 cursor-pointer group"
       style={{
-        backgroundColor: isActive ? "#8B5CF60F" : "transparent",
+        backgroundColor: isActive ? "#8B5CF60F" : undefined,
       }}
     >
       {isActive && (
@@ -361,14 +363,14 @@ function SidebarItem({
           transition={{ type: "spring", stiffness: 350, damping: 30 }}
         />
       )}
-      <div className="relative z-10 w-8 h-8 rounded-xl flex items-center justify-center transition-colors duration-200" style={{ backgroundColor: isActive ? "#8B5CF620" : "#ffffff06" }}>
-        <Icon size={16} style={{ color: isActive ? "#A78BFA" : "#ffffff40" }} />
+        <div className="relative z-10 w-8 h-8 rounded-xl flex items-center justify-center transition-colors duration-200" style={{ backgroundColor: isActive ? "#8B5CF620" : "var(--ff-border)" }}>
+          <Icon size={16} style={{ color: isActive ? "#A78BFA" : "var(--ff-icon-muted)" }} />
       </div>
       <div className="relative z-10 min-w-0">
-        <span className="text-[13px] font-medium block transition-colors duration-200" style={{ color: isActive ? "#E9DFFF" : "#ffffff70" }}>
+        <span className="text-[13px] font-medium block transition-colors duration-200" style={{ color: isActive ? "#E9DFFF" : "var(--ff-label-inactive)" }}>
           {category.label}
         </span>
-        <span className="text-[11px] block truncate transition-colors duration-200" style={{ color: isActive ? "#A78BFA80" : "#ffffff25" }}>
+        <span className="text-[11px] block truncate transition-colors duration-200" style={{ color: isActive ? "#A78BFA80" : "var(--ff-desc-inactive)" }}>
           {category.description}
         </span>
       </div>
@@ -392,14 +394,14 @@ function MobileListItem({
       className="w-full flex items-center gap-4 px-5 py-4 active:bg-white/3 transition-colors cursor-pointer"
       whileTap={{ scale: 0.985 }}
     >
-      <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0" style={{ backgroundColor: "#1A1A1E" }}>
+      <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0" style={{ backgroundColor: "var(--ff-surface-raised)" }}>
         <Icon size={18} className="text-[#A78BFA]" />
       </div>
       <div className="flex-1 text-left min-w-0">
-        <p className="text-sm font-medium text-white/90">{category.label}</p>
-        <p className="text-xs text-white/35 mt-0.5">{category.description}</p>
+        <p className="text-sm font-medium text-gray-900/88 dark:text-white/90">{category.label}</p>
+        <p className="text-xs text-gray-900/40 dark:text-white/35 mt-0.5">{category.description}</p>
       </div>
-      <ChevronRight size={16} className="text-white/15 shrink-0" />
+      <ChevronRight size={16} className="text-gray-900/20 dark:text-white/15 shrink-0" />
     </motion.button>
   );
 }
@@ -434,13 +436,13 @@ export function Setting() {
   /* ────────── Desktop: Master-Detail Split View ────────── */
   if (isDesktop) {
     return (
-      <div className="fixed inset-0 flex" style={{ backgroundColor: "#0A0A0C" }}>
+      <div className="fixed inset-0 flex" style={{ backgroundColor: "var(--ff-bg)" }}>
         {/* Sidebar */}
-        <aside className="w-75 shrink-0 flex flex-col border-r" style={{ borderColor: "#ffffff08", backgroundColor: "#0E0E11" }}>
+        <aside className="w-75 shrink-0 flex flex-col border-r" style={{ borderColor: "var(--ff-border)", backgroundColor: "var(--ff-surface)" }}>
           {/* Sidebar Header */}
           <div className="px-6 pt-8 pb-4">
-            <h1 className="text-xl font-bold text-white tracking-tight">Settings</h1>
-            <p className="text-xs text-white/30 mt-1">Manage your preferences</p>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Settings</h1>
+            <p className="text-xs text-gray-900/40 dark:text-white/30 mt-1">Manage your preferences</p>
           </div>
           {/* Category List */}
           <nav className="flex-1 overflow-y-auto px-3 pb-6 space-y-1">
@@ -449,8 +451,8 @@ export function Setting() {
             ))}
           </nav>
           {/* Sidebar Footer */}
-          <div className="px-6 py-4 border-t" style={{ borderColor: "#ffffff06" }}>
-            <p className="text-[10px] text-white/15 font-medium tracking-wider uppercase">FocusFlight v0.0.1</p>
+          <div className="px-6 py-4 border-t" style={{ borderColor: "var(--ff-border)" }}>
+            <p className="text-[10px] text-gray-900/25 dark:text-white/15 font-medium tracking-wider uppercase">FocusFlight v0.0.1</p>
           </div>
         </aside>
 
@@ -473,8 +475,8 @@ export function Setting() {
                       <ActiveIcon size={20} className="text-[#A78BFA]" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-bold text-white">{activeLabel}</h2>
-                      <p className="text-xs text-white/30">{categories.find((c) => c.id === activeCategory)?.description}</p>
+                      <h2 className="text-lg font-bold text-gray-900 dark:text-white">{activeLabel}</h2>
+                      <p className="text-xs text-gray-900/40 dark:text-white/30">{categories.find((c) => c.id === activeCategory)?.description}</p>
                     </div>
                   </div>
                   {/* Content Body */}
@@ -494,7 +496,7 @@ export function Setting() {
 
   /* ────────── Mobile: Single-Column Drill-Down ─────────── */
   return (
-    <div className="fixed inset-0 overflow-hidden" style={{ backgroundColor: "#0A0A0C" }}>
+      <div className="fixed inset-0 overflow-hidden" style={{ backgroundColor: "var(--ff-bg)" }}>
       <AnimatePresence initial={false}>
         {activeCategory === null ? (
           /* Root List */
@@ -507,24 +509,24 @@ export function Setting() {
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           >
             <div className="px-5 pt-14 pb-3">
-              <h1 className="text-2xl font-bold text-white tracking-tight">Settings</h1>
-              <p className="text-xs text-white/30 mt-1">Manage your preferences</p>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Settings</h1>
+              <p className="text-xs text-gray-900/40 dark:text-white/30 mt-1">Manage your preferences</p>
             </div>
-            <div className="divide-y" style={{ borderColor: "#ffffff06" }}>
+            <div className="divide-y" style={{ borderColor: "var(--ff-border)" }}>
               {categories.map((cat, i) => (
                 <motion.div
                   key={cat.id}
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.04, duration: 0.3 }}
-                  style={{ borderColor: "#ffffff06" }}
+                  style={{ borderColor: "var(--ff-border)" }}
                 >
                   <MobileListItem category={cat} onClick={() => handleSelect(cat.id)} />
                 </motion.div>
               ))}
             </div>
             <div className="px-5 py-8">
-              <p className="text-[10px] text-white/15 text-center font-medium tracking-wider uppercase">FocusFlight v0.0.1</p>
+              <p className="text-[10px] text-gray-900/25 dark:text-white/15 text-center font-medium tracking-wider uppercase">FocusFlight v0.0.1</p>
             </div>
           </motion.div>
         ) : (
@@ -538,7 +540,7 @@ export function Setting() {
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           >
             {/* Mobile Back Header */}
-            <div className="sticky top-0 z-10 backdrop-blur-xl" style={{ backgroundColor: "#0A0A0Cee" }}>
+              <div className="sticky top-0 z-10 backdrop-blur-xl" style={{ backgroundColor: "var(--ff-overlay)" }}>
               <div className="flex items-center gap-3 px-4 pt-14 pb-4">
                 <Button
                   onClick={handleBack}
@@ -546,9 +548,9 @@ export function Setting() {
                 >
                   <ChevronLeft size={18} className="text-white/60" />
                 </Button>
-                <h2 className="text-base font-bold text-white">{activeLabel}</h2>
+                <h2 className="text-base font-bold text-gray-900 dark:text-white">{activeLabel}</h2>
               </div>
-              <div className="h-px" style={{ backgroundColor: "#ffffff06" }} />
+              <div className="h-px" style={{ backgroundColor: "var(--ff-border)" }} />
             </div>
             {/* Mobile Content */}
             <div className="px-5 py-4 pb-16">

@@ -78,6 +78,7 @@ export const Map = ({
     const defaults = detectedLibrary === "maplibre" ? defaultMapLibreStyles : defaultMapStyles
     const darkStyle = styles?.dark ?? defaults.dark
     const lightStyle = styles?.light ?? defaults.light
+    console.log(resolvedTheme)
 
     return resolvedTheme === "dark" ? darkStyle : lightStyle
   }

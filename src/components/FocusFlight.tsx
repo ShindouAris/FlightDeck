@@ -49,14 +49,14 @@ export function FocusFlight() {
     const [focusTime, setFocusTime] = useState(30000)
     const [timeLeft, setTimeLeft] = useState(30000)
     const [isTimerDialogOpen, setIsTimerDialogOpen] = useState(false)
-    const [draftFocusMinutes, setDraftFocusMinutes] = useState(1)
+    const [draftFocusMinutes, setDraftFocusMinutes] = useState(30)
     const [isHoldingStop, setIsHoldingStop] = useState(false)
     const [holdProgress, setHoldProgress] = useState(0)
     const [currentLocation, setCurrentLocation] = useState<[longitude: number, latitude: number][] | null>(null)
     const [actionBarOpen, setActionBarOpen] = useState(true)
     const holdTimeoutRef = useRef<number | null>(null)
     const holdProgressIntervalRef = useRef<number | null>(null)
-    const [currentMarkerLocation, setCurrentMarkerLocation] = useState<[number, number] | null>(null)
+    const currentMarkerLocationRef = useRef<[number, number] | null>(null)
 
 
     const clearHoldTimers = () => {
@@ -187,7 +187,7 @@ export function FocusFlight() {
 
     const handleFocusFlightStart = () => {
         if (isPlaying) {
-            gooeyToast.error("Focus Flight is already in progress!")
+            // gooeyToast.error("Focus Flight is already in progress!")
             return
         }
         if (route.length < 2) {
@@ -334,7 +334,6 @@ export function FocusFlight() {
         <Map
             accessToken={MAPBOX_ACCESS_TOKEN}
             styles={HAS_MAPBOX_TOKEN ? undefined : FALLBACK_STYLES}
-            style="mapbox://styles/mapbox/dark-v11"
             center={currentLocation ? currentLocation[0] : [106.7009, 10.7769]}
             pitch={80}
             zoom={12} 
@@ -350,8 +349,10 @@ export function FocusFlight() {
                         pitch={60}
                         zoom={12}
                         onComplete={handleEndRoute}
-                        onLocationChange={(location) => setCurrentMarkerLocation(location)}
-                        marker={<RiPlaneFill className="h-20 w-20 text-white" />}
+                        onLocationChange={(location) => {
+                            currentMarkerLocationRef.current = location;
+                        }}
+                        marker
                     />
                 </>
             )}
@@ -365,7 +366,7 @@ export function FocusFlight() {
                 <ActionBar
                     open={actionBarOpen}
                     distance={Math.round(turf.distance(
-                        currentMarkerLocation ? [currentMarkerLocation[0], currentMarkerLocation[1]] : [selectedDpAirport.long, selectedDpAirport.lat],
+                        currentMarkerLocationRef.current ? [currentMarkerLocationRef.current[0], currentMarkerLocationRef.current[1]] : [selectedDpAirport.long, selectedDpAirport.lat],
                         [selectedArAirport.long, selectedArAirport.lat],
                         { units: 'nauticalmiles' }
                     ))}

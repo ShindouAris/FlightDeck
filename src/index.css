@@ -4,6 +4,33 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ── FocusFlight app color tokens ── */
+:root {
+  /* light mode */
+  --ff-bg: #F3F3F6;
+  --ff-surface: #FFFFFF;
+  --ff-surface-mid: #F5F5F8;
+  --ff-surface-raised: #EBEBEE;
+  --ff-border: rgba(0, 0, 0, 0.07);
+  --ff-overlay: rgba(243, 243, 246, 0.93);
+  --ff-icon-muted: rgba(0, 0, 0, 0.35);
+  --ff-label-inactive: rgba(0, 0, 0, 0.55);
+  --ff-desc-inactive: rgba(0, 0, 0, 0.30);
+}
+
+html.dark {
+  /* dark mode */
+  --ff-bg: #0A0A0C;
+  --ff-surface: #0E0E11;
+  --ff-surface-mid: #141416;
+  --ff-surface-raised: #1E1E22;
+  --ff-border: rgba(255, 255, 255, 0.031);
+  --ff-overlay: rgba(10, 10, 12, 0.93);
+  --ff-icon-muted: rgba(255, 255, 255, 0.40);
+  --ff-label-inactive: rgba(255, 255, 255, 0.44);
+  --ff-desc-inactive: rgba(255, 255, 255, 0.145);
+}
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
