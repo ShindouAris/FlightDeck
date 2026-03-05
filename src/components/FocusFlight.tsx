@@ -17,6 +17,7 @@ import {
     DialogTitle,
 } from "@/components/ui/animate-ui/components/radix/dialog";
 import { gooeyToast } from "goey-toast";
+import { RiPlaneFill } from "react-icons/ri";
 
 const MAPBOX_ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 const HAS_MAPBOX_TOKEN = Boolean(MAPBOX_ACCESS_TOKEN);
@@ -139,6 +140,7 @@ export function FocusFlight() {
         clearHoldTimers()
         setIsHoldingStop(false)
         setHoldProgress(0)
+        setActionBarOpen(true)
         stop()
 
         setRoute([])
@@ -181,6 +183,22 @@ export function FocusFlight() {
             setTimeLeft(nextFocusTime)
         }
         setIsTimerDialogOpen(false)
+    }
+
+    const handleFocusFlightStart = () => {
+        if (isPlaying) {
+            gooeyToast.error("Focus Flight is already in progress!")
+            return
+        }
+        if (route.length < 2) {
+            gooeyToast.error("Please select both Departure and Arrival airports to start the Focus Flight.")
+            return
+        }
+        toggle()
+        const IntervalID = setInterval(() => {
+            setActionBarOpen(false)
+            clearInterval(IntervalID)
+        }, 3000)
     }
 
 
@@ -253,11 +271,7 @@ export function FocusFlight() {
             </button>
             <button
                 className={`relative overflow-hidden px-3 py-1 rounded ${isPlaying ? "bg-red-600 text-white" : "bg-gray-200 text-purple-400"}`}
-                onClick={() => {
-                    if (!isPlaying) {
-                        toggle()
-                    }
-                }}
+                onClick={handleFocusFlightStart}
                 onMouseDown={startHoldToStop}
                 onMouseUp={cancelHoldToStop}
                 onMouseLeave={cancelHoldToStop}
@@ -293,10 +307,10 @@ export function FocusFlight() {
                         <p className="text-sm text-muted-foreground">{draftFocusMinutes} min</p>
                         <Slider
                             value={[draftFocusMinutes]}
-                            min={1}
-                            max={180}
+                            min={30}
+                            max={900} // 15 tiếng focus đã luôn
                             step={1}
-                            onValueChange={(value) => setDraftFocusMinutes(value[0] ?? 1)}
+                            onValueChange={(value) => setDraftFocusMinutes(value[0] ?? 30)}
                         />
                     </div>
                     <DialogFooter>
@@ -337,7 +351,7 @@ export function FocusFlight() {
                         zoom={12}
                         onComplete={handleEndRoute}
                         onLocationChange={(location) => setCurrentMarkerLocation(location)}
-                        marker
+                        marker={<RiPlaneFill className="h-20 w-20 text-white" />}
                     />
                 </>
             )}
