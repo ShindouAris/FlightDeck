@@ -23,6 +23,7 @@ type MapCameraFollowProps = {
   marker?: boolean | ReactNode
   markerSize?: number
   onComplete?: () => void
+  onLocationChange?: (location: [number, number]) => void
 }
 
 const DEFAULT_DURATION = 20000
@@ -62,7 +63,7 @@ const DefaultNavigationMarker = ({ size }: { size: number }) => {
   )
 }
 
-export const    MapCameraFollow = ({
+export const MapCameraFollow = ({
   path,
   duration = DEFAULT_DURATION,
   zoom = DEFAULT_ZOOM,
@@ -73,6 +74,7 @@ export const    MapCameraFollow = ({
   marker,
   markerSize = DEFAULT_MARKER_SIZE,
   onComplete,
+  onLocationChange,
 }: MapCameraFollowProps) => {
   const { map, isLoaded } = useMap()
 
@@ -164,6 +166,7 @@ export const    MapCameraFollow = ({
       const lookAheadPosition = interpolatePosition(path, Math.min(progress + 0.02, 1))
       const bearing = calculateBearing(currentPosition, lookAheadPosition)
 
+      onLocationChange?.(currentPosition)
       setMarkerState({ position: currentPosition, bearing })
 
       try {
