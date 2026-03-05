@@ -18,6 +18,7 @@ interface AirportMarkersProps {
   minZoom?: number
   /** Maximum number of markers to render at once (safety cap, default: 500) */
   maxMarkers?: number
+  onClick?: (airport: Airport) => void
 }
 
 /**
@@ -33,6 +34,7 @@ export function AirportMarkers({
   airports,
   minZoom = 6,
   maxMarkers = 300,
+  onClick,
 }: AirportMarkersProps) {
   const { map, isLoaded } = useMap()
   const [visibleAirports, setVisibleAirports] = useState<Airport[]>([])
@@ -106,7 +108,7 @@ export function AirportMarkers({
           coordinates={[airport.long, airport.lat]}
         >
           <MarkerContent>
-            <div className="bg-black/80 text-yellow-400 text-xs px-2 py-1 rounded shadow-lg whitespace-nowrap backdrop-blur-sm">
+            <div className="bg-black/80 text-yellow-400 text-xs px-2 py-1 rounded shadow-lg whitespace-nowrap backdrop-blur-sm" onClick={() => onClick?.(airport)}>
               <LuPlane className="inline-block mr-1" />
               <span className="font-semibold">{airport.iata_code !== "" ? airport.iata_code : airport.ident}</span>
             </div>
