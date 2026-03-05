@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router'
 import { FocusFlight } from '@/components/FocusFlight'
 import './App.css'
 import { DemoRender} from '@/components/TicketRender'
+import { RenderActionBar } from '@/components/ActionBar'
 function App() {
 
   return (
@@ -9,6 +10,7 @@ function App() {
       <Routes>
         <Route path="/" element={<FocusFlight />} />
         <Route path="/demo" element={<DemoRender />} />
+        <Route path='/actionbar' element={<RenderActionBar />} />
       </Routes>
     </BrowserRouter>
   )

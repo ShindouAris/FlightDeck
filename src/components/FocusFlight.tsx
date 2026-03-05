@@ -5,8 +5,8 @@ import { AirportMarkers } from "./AirportMarkers";
 import { MapLine } from "./ui/map/line";
 import { MapCameraFollow, useCameraFollowControl } from "./ui/map/camera-follow";
 import * as turf from "@turf/turf";
-import Counter from "./ui/Counter";
 import { MapMarkerAnimated } from "./ui/map/marker-animated";
+import { ActionBar } from "./ActionBar";
 import { Slider } from "@/components/ui/slider";
 import {
     Dialog,
@@ -16,6 +16,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/animate-ui/components/radix/dialog";
+import { gooeyToast } from "goey-toast";
 
 const MAPBOX_ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 const HAS_MAPBOX_TOKEN = Boolean(MAPBOX_ACCESS_TOKEN);
@@ -51,8 +52,10 @@ export function FocusFlight() {
     const [isHoldingStop, setIsHoldingStop] = useState(false)
     const [holdProgress, setHoldProgress] = useState(0)
     const [currentLocation, setCurrentLocation] = useState<[longitude: number, latitude: number][] | null>(null)
+    const [actionBarOpen, setActionBarOpen] = useState(true)
     const holdTimeoutRef = useRef<number | null>(null)
     const holdProgressIntervalRef = useRef<number | null>(null)
+    const [currentMarkerLocation, setCurrentMarkerLocation] = useState<[number, number] | null>(null)
 
 
     const clearHoldTimers = () => {
@@ -148,9 +151,17 @@ export function FocusFlight() {
 
     const handleAirportClick = (airport: Airport) => {
         if (currentSelect === "departure") {
+            if (selectedArAirport?.id === airport.id) {
+                gooeyToast.error("Departure and Arrival cannot be the same airport!")
+                return
+            }
             setSelectedDpAirport(airport)
             setcurrentSelect("arrival")
         } else if (currentSelect === "arrival") {
+            if (selectedDpAirport?.id === airport.id) {
+                gooeyToast.error("Departure and Arrival cannot be the same airport!")
+                return
+            }
             setSelectedArAirport(airport)
             setcurrentSelect(null)
         }
@@ -224,12 +235,6 @@ export function FocusFlight() {
     }, [isPlaying, route.length, focusTime])
 
     const totalSecondsLeft = Math.ceil(timeLeft / 1000)
-    const hoursLeft = Math.floor(totalSecondsLeft / 3600)
-    const minutesLeft = Math.floor((totalSecondsLeft % 3600) / 60)
-    const visibleTimeUnits = [
-        { label: "Hrs", value: hoursLeft },
-        { label: "Min", value: minutesLeft },
-    ].filter((unit) => unit.value !== 0)
 
   return (
     <Card className="w-full h-screen p-0 gap-0 overflow-hidden">
@@ -321,40 +326,45 @@ export function FocusFlight() {
             zoom={12} 
             showLoader={false}
         >
-            <MapLine coordinates={route} color="#facc15" width={3} />
-            <MapCameraFollow
-                path={route}
-                autoStart={isPlaying}
-                duration={focusTime}
-                pitch={60}
-                zoom={12}
-                onComplete={handleEndRoute}
-                marker
-            />
+            {route.length >= 2 && (
+                <>
+                    <MapLine coordinates={route} color="#facc15" width={3} />
+                    <MapCameraFollow
+                        path={route}
+                        autoStart={isPlaying}
+                        duration={focusTime}
+                        pitch={60}
+                        zoom={12}
+                        onComplete={handleEndRoute}
+                        onLocationChange={(location) => setCurrentMarkerLocation(location)}
+                        marker
+                    />
+                </>
+            )}
             {currentLocation && (<MapMarkerAnimated id="pulsing-dot" coordinates={currentLocation} duration={1000} color="rgba(0, 100, 255, 1)" />)}
             <AirportMarkers airports={airports} minZoom={6} maxMarkers={500} onClick={handleAirportClick} />
         </Map>
         {/* Bottom */}
 
-        {isPlaying && (
-            <>
-                <div className="absolute justify-center bottom-4 left-4 z-10 text-white px-4 py-2 rounded">
-                    <span>Time Left</span>
-                    <div className="flex items-center gap-3">
-                    {visibleTimeUnits.map((unit) => (
-                        <div key={unit.label} className="flex flex-col items-center">
-                        <Counter value={unit.value} places={[10, 1]} gradientFrom="transparent" fontSize={40} />
-                        <span className="text-xs text-white/80">{unit.label}</span>
-                        </div>
+        {isPlaying && selectedDpAirport && selectedArAirport && (
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 w-full px-4 flex justify-center">
+                <ActionBar
+                    open={actionBarOpen}
+                    distance={Math.round(turf.distance(
+                        currentMarkerLocation ? [currentMarkerLocation[0], currentMarkerLocation[1]] : [selectedDpAirport.long, selectedDpAirport.lat],
+                        [selectedArAirport.long, selectedArAirport.lat],
+                        { units: 'nauticalmiles' }
                     ))}
-                    </div>
-                </div>
-                <div className="absolute bottom-4 right-4 z-10 bg-black/50 text-white px-4 py-2 rounded backdrop-blur-sm">
-                    <p className="text-sm">
-                    {selectedArAirport && `Arrival: ${selectedArAirport.name} (${selectedArAirport.iata_code || selectedArAirport.ident})`}
-                    </p>
-                </div>
-            </>
+                    origin={selectedDpAirport.name}
+                    destination={selectedArAirport.name}
+                    iataorigin={selectedDpAirport.iata_code || selectedDpAirport.ident}
+                    iatadestination={selectedArAirport.iata_code || selectedArAirport.ident}
+                    timeLeft={totalSecondsLeft}
+                    totalTime={Math.ceil(focusTime / 1000)}
+                    endTime={new Date(Date.now() + timeLeft)}
+                    handleOpenClick={() => setActionBarOpen(o => !o)}
+                />
+            </div>
         )}
     </Card>
 
