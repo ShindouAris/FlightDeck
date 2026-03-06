@@ -264,7 +264,7 @@ export function FocusFlight() {
                     />
                 </>
             )}
-            {currentLocation && (
+            {currentLocation && !isPlaying && (
                 <MapMarkerAnimated id="pulsing-dot" coordinates={currentLocation} duration={1000} color="rgba(0, 100, 255, 1)" />
             )}
             <AirportMarkers airports={airports} minZoom={6} maxMarkers={500} onClick={handleAirportClick} />
