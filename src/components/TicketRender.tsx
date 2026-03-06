@@ -2,6 +2,7 @@ import { LuPlane } from "react-icons/lu";
 import DottedMap from "dotted-map";
 import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "./ui/button";
 
 interface BoardingTicketProps {
   iataDeparture: string;
@@ -13,6 +14,7 @@ interface BoardingTicketProps {
   timefocus: number;
   flightNo?: string;
   date?: string;
+  disableTorn?: boolean;
   onTorn?: () => void;
 }
 
@@ -50,6 +52,7 @@ export const BoardingTicket: React.FC<BoardingTicketProps> = ({
   timefocus,
   flightNo = "ARS367",
   date,
+  disableTorn = false,
   onTorn,
 }) => {
   const [torn, setTorn] = useState(false);
@@ -78,7 +81,8 @@ export const BoardingTicket: React.FC<BoardingTicketProps> = ({
       : `${timefocus}m`;
 
   const handleTear = () => {
-    if (!torn) setTorn(true);
+
+    if (!torn && !disableTorn) setTorn(true);
   };
 
   return (
@@ -233,13 +237,16 @@ export const BoardingTicket: React.FC<BoardingTicketProps> = ({
 };
 
 export const TicketPrint = () => {
+  const [animKey, setAnimKey] = useState(0);
+
   return (
-    <div className="w-full h-screen flex items-center justify-center bg-black">
+    <div  className="w-full h-screen flex items-center justify-center bg-black overflow-hidden perspective-[1000px]"  >
       <motion.div
-        initial={{clipPath: "inset(0 0 100% 0)"}}
-        animate={{clipPath: "inset(0% 0 0 0)"}}
-        transition={{duration: 1}}
-      
+        key={animKey}
+        initial={{clipPath: "inset(0 0 100% 0)", y: 400, scaleX: 0.94, rotateX: -35}}
+        animate={{clipPath: "inset(0% 0 0 0)", y: 0, scaleX: 1, rotateX: 0}}
+        transition={{duration: 4, ease: "easeOut"}}
+        // onAnimationEnd={} // might me useful for trigger the button to replace the print hole
       >
         <BoardingTicket
           iataDeparture="KHN"
@@ -252,7 +259,19 @@ export const TicketPrint = () => {
           flightNo="CM0001"
           date="2026/03/03"
         />
+
+        <Button variant="outline" className="mt-6 w-full bg-white! text-black rounded-full" 
+          onClick={() => setAnimKey(k => k + 1)}>
+          Check In
+        </Button>
+
       </motion.div>
+      <button
+        onClick={() => setAnimKey(k => k + 1)}
+        className="px-5 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white text-sm font-medium tracking-wide transition-colors border border-white/15"
+      >
+        Replay
+      </button>
     </div>
   );
 };

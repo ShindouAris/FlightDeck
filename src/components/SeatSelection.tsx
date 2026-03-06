@@ -184,12 +184,13 @@ function Seat({
   );
 }
 
-export default function SeatSelection() {
+export default function SeatSelection({ onSeatSelect }: { onSeatSelect?: () => void } = {}) {
   const [seats] = useState(generateSeats);
   const [selection, setSelection] = useState<{ seat: SeatData; activity: Activity } | null>(null);
 
   const handleSelect = (seat: SeatData, activity: Activity) => {
     setSelection({ seat, activity });
+    onSeatSelect?.();
   };
 
   const firstSeats = seats.filter((s) => s.class === SEAT_CLASSES.FIRST);
@@ -232,12 +233,11 @@ export default function SeatSelection() {
     <div
       className="min-h-screen flex flex-col lg:flex-row gap-0"
       style={{
-        background: "#080b12",
         fontFamily: "'DM Mono', 'Courier New', monospace",
       }}
     >
       {/* Plane map */}
-      <div className="flex-1 flex flex-col items-center py-10 px-4 overflow-y-auto ">
+      <div className="flex-1 flex flex-col items-center py-10 px-4 overflow-y-auto bg-black/5 backdrop:backdrop-blur-lg">
 
         {/* Plane body */}
         <div

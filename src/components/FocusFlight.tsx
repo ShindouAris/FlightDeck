@@ -7,10 +7,12 @@ import { MapCameraFollow, useCameraFollowControl } from "./ui/map/camera-follow"
 import * as turf from "@turf/turf";
 import { MapMarkerAnimated } from "./ui/map/marker-animated";
 import { ActionBar } from "./ActionBar";
+import SeatSelection from "./SeatSelection";
 import { Slider } from "@/components/ui/slider";
 import { gooeyToast } from "goey-toast";
 import { RiPlaneFill } from "react-icons/ri";
 import { LuPlaneLanding, LuPlaneTakeoff } from "react-icons/lu";
+import { AnimatePresence, motion } from "framer-motion";
 
 const MAPBOX_ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 const HAS_MAPBOX_TOKEN = Boolean(MAPBOX_ACCESS_TOKEN);
@@ -37,7 +39,8 @@ export function FocusFlight() {
 
     const [selectedDpAirport, setSelectedDpAirport] = useState<Airport | null>(null)
     const [selectedArAirport, setSelectedArAirport] = useState<Airport | null>(null)
-    const [bookingStep, setBookingStep] = useState<"idle" | "select-departure" | "select-focus-time" | "select-arrival" | "ready">("idle")
+    const [bookingStep, setBookingStep] = useState<"idle" | "select-departure" | "select-focus-time" | "select-arrival" | "select-seat" | "ready">("idle")
+    const [hasSeatSelected, setHasSeatSelected] = useState(false)
     const [route, setRoute] = useState<[number, number][]>([])
     const [focusTime, setFocusTime] = useState(1800000)
     const [timeLeft, setTimeLeft] = useState(1800000)
@@ -142,6 +145,7 @@ export function FocusFlight() {
         setDraftFocusMinutes(30)
         setFocusTime(1800000)
         setTimeLeft(1800000)
+        setHasSeatSelected(false)
     }
 
     const handleAirportClick = (airport: Airport) => {
@@ -158,7 +162,7 @@ export function FocusFlight() {
                 return
             }
             setSelectedArAirport(airport)
-            setBookingStep("ready")
+            setBookingStep("select-seat")
         }
     }
 
@@ -391,6 +395,60 @@ export function FocusFlight() {
                 </div>
             </div>
         )}
+
+        {/* ─── SELECT SEAT: Full-screen seat selection overlay ──────── */}
+        <AnimatePresence>
+        {bookingStep === "select-seat" && (
+            <>
+                {/* Blurred backdrop */}
+                <motion.div
+                    className="absolute inset-0 z-20 backdrop-blur-md bg-transparent"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                />
+
+                {/* Slide-up panel */}
+                <motion.div
+                    className="absolute inset-x-0 bottom-0 top-0 z-30 flex flex-col overflow-hidden"
+                    initial={{ y: "100%" }}
+                    animate={{ y: 0 }}
+                    exit={{ y: "-100%" }}
+                    transition={{ type: "spring", stiffness: 320, damping: 36, mass: 1 }}
+                >
+                    {/* Header pill */}
+                    <div className="absolute top-5 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
+                        <div className="flex items-center gap-2.5 px-5 py-2.5 rounded-full backdrop-blur-xl border border-white/10 shadow-lg">
+                            <span className="w-2 h-2 rounded-full shrink-0 animate-pulse bg-blue-400" />
+                            <span className="text-white/80 text-sm font-medium whitespace-nowrap">Choose your seat</span>
+                        </div>
+                    </div>
+
+                    {/* Scrollable seat map */}
+                    <div className="flex-1 overflow-y-auto">
+                        <SeatSelection onSeatSelect={() => setHasSeatSelected(true)} />
+                    </div>
+
+                    {/* Confirm button */}
+                    <div className="shrink-0 px-4 py-4 bg-[#080b12]/90 backdrop-blur-xl border-t border-white/[0.07]">
+                        <button
+                            disabled={!hasSeatSelected}
+                            onClick={() => setBookingStep("ready")}
+                            className={`w-full py-3.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all duration-200
+                                ${hasSeatSelected
+                                    ? "bg-emerald-500/15 border border-emerald-400/30 text-emerald-100 hover:bg-emerald-500/25 hover:border-emerald-400/50 cursor-pointer"
+                                    : "bg-white/5 border border-white/10 text-white/30 cursor-not-allowed"
+                                }`}
+                        >
+                            <RiPlaneFill className={`text-lg ${hasSeatSelected ? "text-emerald-300" : "text-white/20"}`} />
+                            {hasSeatSelected ? "Confirm seat" : "Select a seat to continue"}
+                        </button>
+                    </div>
+                </motion.div>
+            </>
+        )}
+        </AnimatePresence>
 
         {/* ─── READY: Summary card + "Go" button ────────────────────── */}
         {bookingStep === "ready" && selectedDpAirport && selectedArAirport && !isPlaying && (
