@@ -230,20 +230,4 @@ export const MapCameraFollow = ({
   return null
 }
 
-export const useCameraFollowControl = () => {
-  const [isPlaying, setIsPlaying] = useState(false)
 
-  const start = () => {
-    setIsPlaying(true)
-  }
-
-  const stop = () => {
-    setIsPlaying(false)
-  }
-
-  const toggle = () => {
-    setIsPlaying((prev) => !prev)
-  }
-
-  return { isPlaying, start, stop, toggle }
-}

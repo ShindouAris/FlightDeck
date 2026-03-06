@@ -1,5 +1,5 @@
 import { useTheme } from "next-themes"
-import { createContext, useEffect, useRef, useState, type ReactNode } from "react"
+import { useEffect, useRef, useState, type ReactNode } from "react"
 import type { ErrorEvent as MapErrorEvent, Map as MapboxMap } from "mapbox-gl"
 import { mapgl, detectedLibrary } from "./map-library"
 import { Globe } from "lucide-react"
@@ -12,8 +12,7 @@ import {
   type MapCoordinates,
   type MapBounds,
 } from "./types"
-
-export const MapContext = createContext<MapContextValue | null>(null)
+import { MapContext } from "./hooks"
 
 const DEFAULT_CENTER: MapCoordinates = [0, 0]
 const DEFAULT_ZOOM = 2
@@ -78,7 +77,7 @@ export const Map = ({
     const defaults = detectedLibrary === "maplibre" ? defaultMapLibreStyles : defaultMapStyles
     const darkStyle = styles?.dark ?? defaults.dark
     const lightStyle = styles?.light ?? defaults.light
-    console.log(resolvedTheme)
+
 
     return resolvedTheme === "dark" ? darkStyle : lightStyle
   }

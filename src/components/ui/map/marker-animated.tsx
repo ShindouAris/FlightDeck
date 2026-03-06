@@ -238,15 +238,4 @@ export function MapMarkerAnimated({
   return null
 }
 
-/**
- * Hook to control animated marker playback
- */
-export function useMarkerAnimatedControl() {
-  const [isPlaying, setIsPlaying] = useState(false)
 
-  const start = () => setIsPlaying(true)
-  const stop = () => setIsPlaying(false)
-  const toggle = () => setIsPlaying((prev) => !prev)
-
-  return { start, stop, toggle, isPlaying }
-}
