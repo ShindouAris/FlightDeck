@@ -70,6 +70,32 @@ function MapController({
     return null
 }
 
+function MapFlightEndReturn({
+    currentLocation,
+    trigger,
+}: {
+    currentLocation: [longitude: number, latitude: number][] | null
+    trigger: number
+}) {
+    const { map, isLoaded } = useMap()
+
+    useEffect(() => {
+        if (trigger === 0 || !currentLocation || !map || !isLoaded) return
+
+        map.stop()
+        map.flyTo({
+            center: currentLocation[0],
+            bearing: 0,
+            pitch: 0,
+            zoom: 10,
+            duration: 3000,
+            essential: true,
+        })
+    }, [currentLocation, trigger, map, isLoaded])
+
+    return null
+}
+
 export function FocusFlight() {
 
     const HOLD_TO_STOP_DURATION = 1500
@@ -88,6 +114,7 @@ export function FocusFlight() {
     const [holdProgress, setHoldProgress] = useState(0)
     const [currentLocation, setCurrentLocation] = useState<[longitude: number, latitude: number][] | null>(null)
     const [actionBarOpen, setActionBarOpen] = useState(true)
+    const [flightEndReturnTrigger, setFlightEndReturnTrigger] = useState(0)
     const holdTimeoutRef = useRef<number | null>(null)
     const holdProgressIntervalRef = useRef<number | null>(null)
     const currentMarkerLocationRef = useRef<[number, number] | null>(null)
@@ -175,6 +202,10 @@ export function FocusFlight() {
         setHoldProgress(0)
         setActionBarOpen(true)
         stop()
+
+        if (currentLocation) {
+            setFlightEndReturnTrigger((value) => value + 1)
+        }
 
         setRoute([])
         setSelectedDpAirport(null)
@@ -297,6 +328,7 @@ export function FocusFlight() {
                 selectedArAirport={selectedArAirport}
                 focusTime={focusTime}
             />
+            <MapFlightEndReturn currentLocation={currentLocation} trigger={flightEndReturnTrigger} />
             {route.length >= 2 && (
                 <>
                     <MapLine coordinates={route} color="#facc15" width={3} />
