@@ -1,6 +1,7 @@
 import { Map  } from "@/components/ui/map/map";
 import { Card } from "./ui/card";
 import { useEffect, useRef, useState } from "react";
+import { useMap } from "./ui/map/hooks";
 import { AirportMarkers } from "./AirportMarkers";
 import { MapLine } from "./ui/map/line";
 import { MapCameraFollow, useCameraFollowControl } from "./ui/map/camera-follow";
@@ -31,6 +32,43 @@ interface Airport {
     long: number
 }
 
+function MapController({
+    selectedDpAirport,
+    selectedArAirport,
+    focusTime,
+}: {
+    selectedDpAirport: Airport | null
+    selectedArAirport: Airport | null
+    focusTime: number
+}) {
+    const { map, isLoaded } = useMap()
+
+    useEffect(() => {
+        if (!selectedDpAirport || !selectedArAirport || !isLoaded || !map) return
+
+        const builtRoute = turf.greatCircle(
+            [selectedDpAirport.long, selectedDpAirport.lat],
+            [selectedArAirport.long, selectedArAirport.lat],
+            { npoints: 200 }
+        )
+        const coords = builtRoute.geometry.coordinates as [number, number][]
+
+        let minLat = Infinity, maxLat = -Infinity, minLng = Infinity, maxLng = -Infinity
+        for (const [lng, lat] of coords) {
+            minLat = Math.min(minLat, lat)
+            maxLat = Math.max(maxLat, lat)
+            minLng = Math.min(minLng, lng)
+            maxLng = Math.max(maxLng, lng)
+        }
+
+        const bounds: [[number, number], [number, number]] = [[minLng, minLat], [maxLng, maxLat]]
+        map.zoomTo(5)
+        map.fitBounds(bounds, { padding: 100, duration: 2000 })
+    }, [selectedDpAirport, selectedArAirport, focusTime, map, isLoaded])
+
+    return null
+}
+
 export function FocusFlight() {
 
     const HOLD_TO_STOP_DURATION = 1500
@@ -52,7 +90,6 @@ export function FocusFlight() {
     const holdTimeoutRef = useRef<number | null>(null)
     const holdProgressIntervalRef = useRef<number | null>(null)
     const currentMarkerLocationRef = useRef<[number, number] | null>(null)
-
 
     const clearHoldTimers = () => {
         if (holdTimeoutRef.current) {
@@ -179,6 +216,9 @@ export function FocusFlight() {
             gooeyToast.error("Please select both Departure and Arrival airports to start the Focus Flight.")
             return
         }
+        const audio = new Audio("/seatbelt.mp3")
+        audio.volume = 0.65
+        audio.play()
         toggle()
         const IntervalID = setInterval(() => {
             setActionBarOpen(false)
@@ -188,14 +228,14 @@ export function FocusFlight() {
 
 
     useEffect(() => {
-        // Build route
-        if (selectedDpAirport && selectedArAirport) {
-            const builtRoute = turf.greatCircle([selectedDpAirport.long, selectedDpAirport.lat], [selectedArAirport.long, selectedArAirport.lat], { npoints: 200 })
-            setRoute(builtRoute.geometry.coordinates as [number, number][])
-            setTimeLeft(focusTime)
-        }
-
-
+        if (!selectedDpAirport || !selectedArAirport) return
+        const builtRoute = turf.greatCircle(
+            [selectedDpAirport.long, selectedDpAirport.lat],
+            [selectedArAirport.long, selectedArAirport.lat],
+            { npoints: 200 }
+        )
+        setRoute(builtRoute.geometry.coordinates as [number, number][])
+        setTimeLeft(focusTime)
     }, [selectedDpAirport, selectedArAirport, focusTime])
 
     useEffect(() => {
@@ -251,6 +291,11 @@ export function FocusFlight() {
             zoom={12}
             showLoader={false}
         >
+            <MapController
+                selectedDpAirport={selectedDpAirport}
+                selectedArAirport={selectedArAirport}
+                focusTime={focusTime}
+            />
             {route.length >= 2 && (
                 <>
                     <MapLine coordinates={route} color="#facc15" width={3} />
