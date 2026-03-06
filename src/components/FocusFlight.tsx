@@ -11,6 +11,15 @@ import { MapMarkerAnimated } from "./ui/map/marker-animated";
 import { ActionBar } from "./ActionBar";
 import SeatSelection from "./SeatSelection";
 import { Slider } from "@/components/ui/slider";
+import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/animate-ui/components/radix/dialog";
 import { gooeyToast } from "goey-toast";
 import { RiPlaneFill } from "react-icons/ri";
 import { LuPlaneLanding, LuPlaneTakeoff } from "react-icons/lu";
@@ -115,9 +124,22 @@ export function FocusFlight() {
     const [currentLocation, setCurrentLocation] = useState<[longitude: number, latitude: number][] | null>(null)
     const [actionBarOpen, setActionBarOpen] = useState(true)
     const [flightEndReturnTrigger, setFlightEndReturnTrigger] = useState(0)
+    const [showFlightEndedDialog, setShowFlightEndedDialog] = useState(false)
     const holdTimeoutRef = useRef<number | null>(null)
     const holdProgressIntervalRef = useRef<number | null>(null)
     const currentMarkerLocationRef = useRef<[number, number] | null>(null)
+
+    const resetSessionState = (nextStep: "idle" | "select-departure") => {
+        setRoute([])
+        setSelectedDpAirport(null)
+        setSelectedArAirport(null)
+        setBookingStep(nextStep)
+        setDraftFocusMinutes(30)
+        setFocusTime(1800000)
+        setTimeLeft(1800000)
+        setHasSeatSelected(false)
+        currentMarkerLocationRef.current = null
+    }
 
     const clearHoldTimers = () => {
         if (holdTimeoutRef.current) {
@@ -207,14 +229,18 @@ export function FocusFlight() {
             setFlightEndReturnTrigger((value) => value + 1)
         }
 
-        setRoute([])
-        setSelectedDpAirport(null)
-        setSelectedArAirport(null)
-        setBookingStep("idle")
-        setDraftFocusMinutes(30)
-        setFocusTime(1800000)
-        setTimeLeft(1800000)
-        setHasSeatSelected(false)
+        resetSessionState("idle")
+        setShowFlightEndedDialog(true)
+    }
+
+    const handleCreateAnotherSession = () => {
+        setShowFlightEndedDialog(false)
+        resetSessionState("select-departure")
+    }
+
+    const handleExitToMainScreen = () => {
+        setShowFlightEndedDialog(false)
+        resetSessionState("idle")
     }
 
     const handleAirportClick = (airport: Airport) => {
@@ -529,7 +555,7 @@ export function FocusFlight() {
         </AnimatePresence>
 
         {/* ─── READY: Summary card + "Go" button ────────────────────── */}
-        {bookingStep === "ready" && selectedDpAirport && selectedArAirport && !isPlaying && (
+        {bookingStep === "ready" && selectedDpAirport && selectedArAirport && !isPlaying && !showFlightEndedDialog && (
             <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 w-full max-w-md px-4">
                 <div className="bg-black/80 backdrop-blur-2xl border border-white/10 rounded-3xl p-5
                                 shadow-[0_-20px_80px_rgba(0,0,0,0.5)] space-y-4">
@@ -630,6 +656,39 @@ export function FocusFlight() {
                 />
             </div>
         )}
+
+        <Dialog open={showFlightEndedDialog}>
+            <DialogContent
+                showCloseButton={false}
+                className="max-w-md border-white/10 bg-black/85 text-white shadow-[0_24px_100px_rgba(0,0,0,0.55)] backdrop-blur-2xl"
+            >
+                <DialogHeader className="gap-3 text-left">
+                    <DialogTitle className="text-2xl font-semibold tracking-tight text-emerald-300">
+                        Focus flight ended
+                    </DialogTitle>
+                    <DialogDescription className="text-sm leading-6 text-white/65">
+                        Your focus flight session is complete. Would you like to create another session or exit back to the main screen?
+                    </DialogDescription>
+                </DialogHeader>
+                <DialogFooter className="mt-2 flex-col gap-3 sm:flex-row sm:justify-end">
+                    <Button
+                        type="button"
+                        variant="outline"
+                        className="border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white"
+                        onClick={handleExitToMainScreen}
+                    >
+                        Exit to main screen
+                    </Button>
+                    <Button
+                        type="button"
+                        className="bg-emerald-500 text-black hover:bg-emerald-400"
+                        onClick={handleCreateAnotherSession}
+                    >
+                        Create another session
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
 
     </Card>
   )
