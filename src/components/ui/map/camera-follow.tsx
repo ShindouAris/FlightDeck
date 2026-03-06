@@ -148,7 +148,28 @@ export const MapCameraFollow = ({
       return
     }
 
-    startTimeRef.current = Date.now() - pausedProgressRef.current * propsRef.current.duration
+    const INTRO_DURATION = 1800
+    const { path, zoom, pitch, duration } = propsRef.current
+    const startPos = interpolatePosition(path, pausedProgressRef.current)
+    const lookAheadPos = interpolatePosition(path, Math.min(pausedProgressRef.current + 0.002, 1))
+    const initialBearing = calculateBearing(startPos, lookAheadPos)
+
+    map.easeTo({
+      center: startPos,
+      bearing: initialBearing,
+      pitch,
+      zoom,
+      duration: INTRO_DURATION,
+    })
+
+    // Schedule the frame loop to start after the intro transition, offsetting
+    // startTimeRef so elapsed is correct when animate() first runs.
+    startTimeRef.current = Date.now() + INTRO_DURATION - pausedProgressRef.current * duration
+
+    loopTimeoutRef.current = setTimeout(() => {
+      loopTimeoutRef.current = undefined
+      animationFrameRef.current = requestAnimationFrame(animate)
+    }, INTRO_DURATION)
 
     const animate = () => {
       if (!map || !propsRef.current.autoStart) {
@@ -178,6 +199,7 @@ export const MapCameraFollow = ({
           duration: 0,
         })
       } catch {
+        console.log("Map animation interrupted, likely due to user interaction. Stopping camera follow.")
         cancelAnimation()
         return
       }
@@ -197,8 +219,6 @@ export const MapCameraFollow = ({
         }, loopDelay)
       }
     }
-
-    animationFrameRef.current = requestAnimationFrame(animate)
 
     return cancelAnimation
   }, [map, isLoaded, autoStart, loop, loopDelay])
