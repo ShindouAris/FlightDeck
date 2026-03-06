@@ -31,21 +31,21 @@ const SEAT_STATUS = {
 function generateSeats(): SeatData[] {
   const seats: SeatData[] = [];
   const takenSeats = new Set([
-    "1A","1C","2B","2F","3A","3D","3F",
-    "5B","5C","5D","6A","6E","6F",
-    "8B","8C","9A","9D","10C","10F",
-    "12A","12B","12E","13C","13F","14A","14D",
-    "15B","15C","16A","16D","16F","17B","17E",
-    "18C","18D","19A","19F","20B","20E",
-    "21A","21D","22C","22F","23B","23E",
-    "24A","24D","25C","25F","26B","26E",
-    "27A","27D","28B","28F","29C","29E",
-    "30A","30D","31B","31F","32C","32E",
+    "1A","1B","2C","3A","3D",
+    "5B","5C","6A","6D",
+    "8B","8C","9A","9D","10C","10D",
+    "12A","12B","13C","13D","14A","14C",
+    "15B","15C","16A","16D","17B","17C",
+    "18C","18D","19A","19B","20B","20C",
+    "21A","21D","22C","22B","23B","23C",
+    "24A","24D","25C","25B","26B","26C",
+    "27A","27D","28B","28C","29C","29B",
+    "30A","30D","31B","31C","32C","32B",
   ]);
 
   // First class (rows 1-3)
   for (let row = 1; row <= 3; row++) {
-    ["A", "C", "D", "F"].forEach((col) => {
+    ["A", "B", "C", "D"].forEach((col) => {
       const id = `${row}${col}`;
       seats.push({
         id,
@@ -60,7 +60,7 @@ function generateSeats(): SeatData[] {
 
   // Business (rows 5-10)
   for (let row = 5; row <= 10; row++) {
-    ["A", "B", "C", "D", "E", "F"].forEach((col) => {
+    ["A", "B", "C", "D"].forEach((col) => {
       const id = `${row}${col}`;
       seats.push({
         id,
@@ -75,7 +75,7 @@ function generateSeats(): SeatData[] {
 
   // Economy (rows 12-32)
   for (let row = 12; row <= 32; row++) {
-    ["A", "B", "C", "D", "E", "F"].forEach((col) => {
+    ["A", "B", "C", "D"].forEach((col) => {
       const id = `${row}${col}`;
       const isExit = row === 16 || row === 22;
       seats.push({
@@ -112,17 +112,19 @@ const focusActivities: Activity[] = [
 function Seat({
   seat,
   isSelected,
+  selectedActivity,
   onSelect,
 }: {
   seat: SeatData;
   isSelected: boolean;
-  onSelect: (seat: SeatData) => void;
+  selectedActivity?: Activity;
+  onSelect: (seat: SeatData, activity: Activity) => void;
 }) {
   const isTaken = seat.status === SEAT_STATUS.TAKEN;
   const [open, setOpen] = useState(false);
 
   const baseStyle =
-    "w-9 h-9 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-lg border transition-all duration-150 flex items-center justify-center relative text-[10px] font-mono tracking-wider";
+    "w-12 h-12 sm:w-13 sm:h-13 md:w-15 md:h-15 rounded-lg border transition-all duration-150 flex items-center justify-center relative text-[10px] font-mono tracking-wider";
 
   const stateStyle = isSelected
     ? "bg-white/90 border-white/70 text-slate-900 shadow-[0_0_16px_rgba(255,255,255,0.25)]"
@@ -138,7 +140,10 @@ function Seat({
           title={isTaken ? "Taken" : seat.id}
           className={`${baseStyle} ${stateStyle}`}
         >
-          {seat.col}
+          {selectedActivity
+            ? <span className={`text-base ${selectedActivity.color ?? "text-slate-300"}`}>{selectedActivity.icon}</span>
+            : null
+          }
           {seat.isExit && !isTaken && (
             <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-orange-400/80 rounded-full" />
           )}
@@ -165,7 +170,7 @@ function Seat({
               key={act.id}
               className="flex items-center gap-1.5 px-2.5 py-2 rounded-full bg-white/6 hover:bg-white/12 border border-white/8 text-slate-300 hover:text-white text-xs font-mono transition-all duration-150 select-none"
               onClick={() => {
-                onSelect(seat);
+                onSelect(seat, act);
                 setOpen(false);
               }}
             >
@@ -173,9 +178,6 @@ function Seat({
               <span className="truncate">{act.name}</span>
             </button>
           ))}
-          <button className="flex items-center justify-center px-2.5 py-2 rounded-full bg-white/6 hover:bg-white/12 border border-white/8 text-slate-500 hover:text-slate-300 transition-all duration-150">
-            <FiPlus className="text-sm" />
-          </button>
         </div>
       </PopoverContent>
     </Popover>
@@ -184,10 +186,10 @@ function Seat({
 
 export default function SeatSelection() {
   const [seats] = useState(generateSeats);
-  const [selected, setSelected] = useState<SeatData | null>(null);
+  const [selection, setSelection] = useState<{ seat: SeatData; activity: Activity } | null>(null);
 
-  const handleSelect = (seat: SeatData) => {
-    setSelected(seat);
+  const handleSelect = (seat: SeatData, activity: Activity) => {
+    setSelection({ seat, activity });
   };
 
   const firstSeats = seats.filter((s) => s.class === SEAT_CLASSES.FIRST);
@@ -210,15 +212,15 @@ export default function SeatSelection() {
         <div key={row} className="flex items-center justify-center gap-2 sm:gap-3">
           <div className="flex gap-1 sm:gap-1.5">
             {left.map((s) => (
-              <Seat key={s.id} seat={s} isSelected={selected?.id === s.id} onSelect={handleSelect} />
+              <Seat key={s.id} seat={s} isSelected={selection?.seat.id === s.id} selectedActivity={selection?.seat.id === s.id ? selection.activity : undefined} onSelect={handleSelect} />
             ))}
           </div>
-          <div className="w-8 sm:w-10 md:w-12 text-center font-mono text-[10px] text-[#2d3748] select-none">
+          <div className="w-12 sm:w-13 md:w-15 text-center font-mono text-[10px] text-[#2d3748] select-none">
             {paddedRow}
           </div>
           <div className="flex gap-1 sm:gap-1.5">
             {right.map((s) => (
-              <Seat key={s.id} seat={s} isSelected={selected?.id === s.id} onSelect={handleSelect} />
+              <Seat key={s.id} seat={s} isSelected={selection?.seat.id === s.id} selectedActivity={selection?.seat.id === s.id ? selection.activity : undefined} onSelect={handleSelect} />
             ))}
           </div>
         </div>
@@ -265,7 +267,7 @@ export default function SeatSelection() {
             {/* First Class column headers */}
             <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3">
               <div className="flex gap-1 sm:gap-1.5">
-                {["A", "C"].map((c) => (
+                {["A", "B"].map((c) => (
                   <div key={c} className="w-9 sm:w-10 md:w-11 text-center text-[9px] text-[#2d3748] font-mono tracking-widest">
                     {c}
                   </div>
@@ -273,8 +275,8 @@ export default function SeatSelection() {
               </div>
               <div className="w-8 sm:w-10 md:w-12" />
               <div className="flex gap-1 sm:gap-1.5">
-                {["D", "F"].map((c) => (
-                  <div key={c} className="w-9 sm:w-10 md:w-11 text-center text-[9px] text-[#2d3748] font-mono tracking-widest">
+                {["C", "D"].map((c) => (
+                  <div key={c} className="w-10 sm:w-13 md:w-15 text-center text-[9px] text-[#2d3748] font-mono tracking-widest">
                     {c}
                   </div>
                 ))}
@@ -283,7 +285,7 @@ export default function SeatSelection() {
 
             {/* First Class */}
             <div className="flex flex-col gap-2">
-              {renderRows(firstSeats, { left: ["A", "C"], right: ["D", "F"] })}
+              {renderRows(firstSeats, { left: ["A", "B"], right: ["C", "D"] })}
             </div>
 
             {/* Galley divider */}
@@ -296,7 +298,7 @@ export default function SeatSelection() {
             {/* Business class column headers */}
             <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3">
               <div className="flex gap-1 sm:gap-1.5">
-                {["A", "B", "C"].map((c) => (
+                {["A", "B"].map((c) => (
                   <div key={c} className="w-9 sm:w-10 md:w-11 text-center text-[9px] text-[#2d3748] font-mono tracking-widest">
                     {c}
                   </div>
@@ -304,8 +306,8 @@ export default function SeatSelection() {
               </div>
               <div className="w-8 sm:w-10 md:w-12" />
               <div className="flex gap-1 sm:gap-1.5">
-                {["D", "E", "F"].map((c) => (
-                  <div key={c} className="w-9 sm:w-10 md:w-11 text-center text-[9px] text-[#2d3748] font-mono tracking-widest">
+                {["C", "D"].map((c) => (
+                  <div key={c} className="w-10 sm:w-13 md:w-15 text-center text-[9px] text-[#2d3748] font-mono tracking-widest">
                     {c}
                   </div>
                 ))}
@@ -314,7 +316,7 @@ export default function SeatSelection() {
 
             {/* Business */}
             <div className="flex flex-col gap-2">
-              {renderRows(businessSeats, { left: ["A", "B", "C"], right: ["D", "E", "F"] })}
+              {renderRows(businessSeats, { left: ["A", "B"], right: ["C", "D"] })}
             </div>
 
             {/* Galley divider */}
@@ -326,7 +328,7 @@ export default function SeatSelection() {
 
             {/* Economy */}
             <div className="flex flex-col gap-2">
-              {renderRows(economySeats, { left: ["A", "B", "C"], right: ["D", "E", "F"] })}
+              {renderRows(economySeats, { left: ["A", "B"], right: ["C", "D"] })}
             </div>
           </div>
 
