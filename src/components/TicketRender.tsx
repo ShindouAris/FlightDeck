@@ -216,7 +216,7 @@ export const BoardingTicket: React.FC<BoardingTicketProps> = ({
         </div>
 
         {/* Barcode */}
-        <div className="px-8 pb-7 pt-2 flex flex-col items-center gap-2">
+        <div className="px-8 pb-5 pt-2 flex flex-col items-center gap-2">
           <img
             src={`data:image/svg+xml;utf8,${encodeURIComponent(barcodeSvg)}`}
             className="w-full h-12 opacity-80"
@@ -232,20 +232,27 @@ export const BoardingTicket: React.FC<BoardingTicketProps> = ({
   );
 };
 
-export const DemoRender = () => {
+export const TicketPrint = () => {
   return (
     <div className="w-full h-screen flex items-center justify-center bg-black">
-      <BoardingTicket
-        iataDeparture="KHN"
-        iataArrival="EHU"
-        departure="Nanchang"
-        arrival="Ezhou"
-        seat="12A"
-        distance={184}
-        timefocus={29}
-        flightNo="CM0001"
-        date="2026/03/03"
-      />
+      <motion.div
+        initial={{clipPath: "inset(0 0 100% 0)"}}
+        animate={{clipPath: "inset(0% 0 0 0)"}}
+        transition={{duration: 1}}
+      
+      >
+        <BoardingTicket
+          iataDeparture="KHN"
+          iataArrival="EHU"
+          departure="Nanchang"
+          arrival="Ezhou"
+          seat="12A"
+          distance={184}
+          timefocus={29}
+          flightNo="CM0001"
+          date="2026/03/03"
+        />
+      </motion.div>
     </div>
   );
 };

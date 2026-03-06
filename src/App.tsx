@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router'
 import { ThemeProvider } from 'next-themes'
 import { FocusFlight } from '@/components/FocusFlight'
 import './App.css'
-import { DemoRender} from '@/components/TicketRender'
+import { TicketPrint } from '@/components/TicketRender'
 import { RenderActionBar } from '@/components/ActionBar'
 import Settings from './components/Settings'
 import SeatSelection from './components/SeatSelection'
@@ -13,7 +13,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<FocusFlight />} />
-          <Route path="/demo" element={<DemoRender />} />
+          <Route path="/print" element={<TicketPrint />} />
           <Route path='/actionbar' element={<RenderActionBar />} />
           <Route path='/settings' element={<Settings />} />
           <Route path='/seat' element={<SeatSelection />} />
