@@ -9,7 +9,7 @@ import { useCameraFollowControl } from "./ui/map/hooks";
 import * as turf from "@turf/turf";
 import { MapMarkerAnimated } from "./ui/map/marker-animated";
 import { ActionBar } from "./ActionBar";
-import SeatSelection from "./SeatSelection";
+import SeatSelection, { type SeatSelectionChoice } from "./SeatSelection";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +24,7 @@ import { gooeyToast } from "goey-toast";
 import { RiPlaneFill } from "react-icons/ri";
 import { LuPlaneLanding, LuPlaneTakeoff } from "react-icons/lu";
 import { AnimatePresence, motion } from "framer-motion";
+import { BoardingTicket } from "./TicketRender";
 
 const MAPBOX_ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 const HAS_MAPBOX_TOKEN = Boolean(MAPBOX_ACCESS_TOKEN);
@@ -41,6 +42,10 @@ interface Airport {
     lat: number
     long: number
 }
+
+type BookingStep = "idle" | "select-departure" | "select-focus-time" | "select-arrival" | "select-seat" | "ticket" | "ready"
+type TicketPhase = "printing" | "printed" | "tear-ready" | "board-ready"
+type ScreenCoverMode = "booking" | "boarding"
 
 function MapController({
     selectedDpAirport,
@@ -108,13 +113,17 @@ function MapFlightEndReturn({
 export function FocusFlight() {
 
     const HOLD_TO_STOP_DURATION = 1500
+    const TICKET_PRINT_DURATION = 4000
+    const SCREEN_COVER_DURATION = 1800
 
     const [airports, setAirports] = useState<Airport[]>([])
 
     const [selectedDpAirport, setSelectedDpAirport] = useState<Airport | null>(null)
     const [selectedArAirport, setSelectedArAirport] = useState<Airport | null>(null)
-    const [bookingStep, setBookingStep] = useState<"idle" | "select-departure" | "select-focus-time" | "select-arrival" | "select-seat" | "ready">("idle")
-    const [hasSeatSelected, setHasSeatSelected] = useState(false)
+    const [bookingStep, setBookingStep] = useState<BookingStep>("idle")
+    const [seatSelection, setSeatSelection] = useState<SeatSelectionChoice | null>(null)
+    const [ticketPhase, setTicketPhase] = useState<TicketPhase>("printing")
+    const [screenCoverMode, setScreenCoverMode] = useState<ScreenCoverMode | null>(null)
     const [route, setRoute] = useState<[number, number][]>([])
     const [focusTime, setFocusTime] = useState(1800000)
     const [timeLeft, setTimeLeft] = useState(1800000)
@@ -134,10 +143,13 @@ export function FocusFlight() {
         setSelectedDpAirport(null)
         setSelectedArAirport(null)
         setBookingStep(nextStep)
+        setSeatSelection(null)
+        setTicketPhase("printing")
+        setScreenCoverMode(null)
         setDraftFocusMinutes(30)
         setFocusTime(1800000)
         setTimeLeft(1800000)
-        setHasSeatSelected(false)
+        setActionBarOpen(true)
         currentMarkerLocationRef.current = null
     }
 
@@ -201,6 +213,39 @@ export function FocusFlight() {
 
     const {isPlaying, toggle, stop} = useCameraFollowControl()
 
+    const handleBeginBooking = () => {
+        setScreenCoverMode("booking")
+    }
+
+    const handleSeatSelect = (choice: SeatSelectionChoice) => {
+        setSeatSelection(choice)
+    }
+
+    const handleSeatConfirm = () => {
+        if (!seatSelection) {
+            return
+        }
+
+        setTicketPhase("printing")
+        setBookingStep("ticket")
+    }
+
+    const handleCheckIn = () => {
+        setTicketPhase("tear-ready")
+    }
+
+    const handleTicketTorn = () => {
+        setTicketPhase((phase) => phase === "tear-ready" ? "board-ready" : phase)
+    }
+
+    const handleBoarding = () => {
+        if (ticketPhase !== "board-ready") {
+            return
+        }
+
+        setScreenCoverMode("boarding")
+    }
+
     useEffect(() => {
         const fetchAirports = async () => {
             try {
@@ -217,6 +262,36 @@ export function FocusFlight() {
         fetchAirports() // Perf nuke, temporarily disable
         getLocation()
     }, [])
+
+    useEffect(() => {
+        if (bookingStep !== "ticket" || ticketPhase !== "printing") {
+            return
+        }
+
+        const timeout = window.setTimeout(() => {
+            setTicketPhase("printed")
+        }, TICKET_PRINT_DURATION)
+
+        return () => window.clearTimeout(timeout)
+    }, [bookingStep, ticketPhase, TICKET_PRINT_DURATION])
+
+    useEffect(() => {
+        if (!screenCoverMode) {
+            return
+        }
+
+        const timeout = window.setTimeout(() => {
+            if (screenCoverMode === "booking") {
+                setBookingStep("select-departure")
+            } else {
+                setBookingStep("ready")
+            }
+
+            setScreenCoverMode(null)
+        }, SCREEN_COVER_DURATION)
+
+        return () => window.clearTimeout(timeout)
+    }, [screenCoverMode, SCREEN_COVER_DURATION])
 
     const handleEndRoute = () => {
         clearHoldTimers()
@@ -257,6 +332,8 @@ export function FocusFlight() {
                 return
             }
             setSelectedArAirport(airport)
+            setSeatSelection(null)
+            setTicketPhase("printing")
             setBookingStep("select-seat")
         }
     }
@@ -336,6 +413,17 @@ export function FocusFlight() {
     }, [isPlaying, route.length, focusTime])
 
     const totalSecondsLeft = Math.ceil(timeLeft / 1000)
+    const isSeatSelected = Boolean(seatSelection)
+    const ticketDistanceKm = selectedDpAirport && selectedArAirport
+        ? Math.round(turf.distance(
+            [selectedDpAirport.long, selectedDpAirport.lat],
+            [selectedArAirport.long, selectedArAirport.lat],
+            { units: "kilometers" }
+        ))
+        : 0
+    const coverCopy = screenCoverMode === "boarding"
+        ? { title: "Cabin door closed", subtitle: "Ready for takeoff" }
+        : { title: "Welcome aboard", subtitle: "Where are we flying today?" }
 
   return (
     <Card className="w-full h-screen p-0 gap-0 overflow-hidden relative">
@@ -381,19 +469,18 @@ export function FocusFlight() {
         {/* ─── IDLE: Full-screen blocking overlay ───────────────────── */}
         {bookingStep === "idle" && (
             <div className="absolute inset-0 z-20 bg-black/55 backdrop-blur-[1.5px] pointer-events-auto">
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 pointer-events-none select-none">
-                    <p className="text-emerald-400 text-5xl uppercase tracking-widest font-semibold">Welcome aboard</p>
-                    <p className="text-blue-400 tracking-[0.45em] uppercase font-bold text-2xl"></p>
-                    <p className="text-pink-300 text-xl font-light">Where are we flying today?</p>
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 pointer-events-none select-none px-4">
+                    <p className="text-emerald-400 text-3xl sm:text-4xl lg:text-5xl uppercase tracking-widest font-semibold text-center">Welcome aboard</p>
+                    <p className="text-pink-300 text-base sm:text-lg lg:text-xl font-light text-center">Where are we flying today?</p>
                 </div>
             </div>
         )}
 
         {/* ─── IDLE: "Book my flight" button ────────────────────────── */}
-        {bookingStep === "idle" && (
+        {bookingStep === "idle" && !screenCoverMode && (
             <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30">
                 <button
-                    onClick={() => setBookingStep("select-departure")}
+                    onClick={handleBeginBooking}
                     className="group flex items-center gap-3 px-8 py-4 rounded-2xl
                                bg-black/65 backdrop-blur-xl
                                border border-amber-400/30
@@ -531,26 +618,100 @@ export function FocusFlight() {
 
                     {/* Scrollable seat map */}
                     <div className="flex-1 overflow-y-auto">
-                        <SeatSelection onSeatSelect={() => setHasSeatSelected(true)} />
+                        <SeatSelection onSeatSelect={handleSeatSelect} />
                     </div>
 
                     {/* Confirm button */}
                     <div className="shrink-0 px-4 py-4 bg-[#080b12]/90 backdrop-blur-xl border-t border-white/[0.07]">
                         <button
-                            disabled={!hasSeatSelected}
-                            onClick={() => setBookingStep("ready")}
+                            disabled={!isSeatSelected}
+                            onClick={handleSeatConfirm}
                             className={`w-full py-3.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all duration-200
-                                ${hasSeatSelected
+                                ${isSeatSelected
                                     ? "bg-emerald-500/15 border border-emerald-400/30 text-emerald-100 hover:bg-emerald-500/25 hover:border-emerald-400/50 cursor-pointer"
                                     : "bg-white/5 border border-white/10 text-white/30 cursor-not-allowed"
                                 }`}
                         >
-                            <RiPlaneFill className={`text-lg ${hasSeatSelected ? "text-emerald-300" : "text-white/20"}`} />
-                            {hasSeatSelected ? "Confirm seat" : "Select a seat to continue"}
+                            <RiPlaneFill className={`text-lg ${isSeatSelected ? "text-emerald-300" : "text-white/20"}`} />
+                            {isSeatSelected ? "Print boarding ticket" : "Select a seat to continue"}
                         </button>
                     </div>
                 </motion.div>
             </>
+        )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+        {bookingStep === "ticket" && selectedDpAirport && selectedArAirport && seatSelection && (
+            <motion.div
+                className="absolute inset-0 z-30 flex items-center justify-center overflow-hidden px-4 py-8 backdrop-blur-xl"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+            >
+                <div className="absolute inset-0 bg-[transparent_30%]" />
+                <div className="relative z-10 flex w-full max-w-5xl flex-col items-center justify-center gap-8 lg:flex-row lg:items-end lg:gap-14">
+                    <motion.div
+                        key={`${selectedDpAirport.id}-${selectedArAirport.id}-${seatSelection.seatId}`}
+                        initial={{ clipPath: "inset(0 0 100% 0)", y: 320, scaleX: 0.94, rotateX: -35 }}
+                        animate={{ clipPath: "inset(0 0 0 0)", y: 0, scaleX: 1, rotateX: 0 }}
+                        transition={{ duration: 4, ease: "easeOut" }}
+                        className="perspective-[1000px]"
+                    >
+                        <BoardingTicket
+                            iataDeparture={selectedDpAirport.iata_code || selectedDpAirport.ident}
+                            iataArrival={selectedArAirport.iata_code || selectedArAirport.ident}
+                            departure={selectedDpAirport.name}
+                            arrival={selectedArAirport.name}
+                            seat={seatSelection.seatId}
+                            distance={ticketDistanceKm}
+                            timefocus={draftFocusMinutes}
+                            disableTorn={ticketPhase !== "tear-ready"}
+                            onTorn={handleTicketTorn}
+                        />
+                    </motion.div>
+
+                    <div className="w-full max-w-sm rounded-[2rem] border border-white/10 bg-black/45 p-6 text-white shadow-[0_24px_80px_rgba(0,0,0,0.45)] backdrop-blur-2xl">
+                        <p className="text-[10px] uppercase tracking-[0.45em] text-white/35">Gate workflow</p>
+                        <div className="mt-4 space-y-3">
+                            <p className="text-3xl font-semibold tracking-tight text-white">
+                                {ticketPhase === "printing" && "Printing boarding pass"}
+                                {ticketPhase === "printed" && "Boarding pass ready"}
+                                {ticketPhase === "tear-ready" && "Check in complete"}
+                                {ticketPhase === "board-ready" && "Gate cleared"}
+                            </p>
+                            <p className="text-sm leading-6 text-white/60">
+                                {ticketPhase === "printing" && `Preparing seat ${seatSelection.seatId} for ${seatSelection.activityName.toLowerCase()} mode.`}
+                                {ticketPhase === "printed" && "Use check in to unlock the tear line on your boarding ticket."}
+                                {ticketPhase === "tear-ready" && "Tear the ticket stub to reveal the final boarding step."}
+                                {ticketPhase === "board-ready" && "Proceed to boarding. The cabin cover will close before takeoff."}
+                            </p>
+                        </div>
+
+                        <div className="mt-6 flex flex-col gap-3">
+                            {ticketPhase === "printed" && (
+                                <Button
+                                    type="button"
+                                    className="h-12 rounded-full bg-white text-black hover:bg-white/90"
+                                    onClick={handleCheckIn}
+                                >
+                                    Check In
+                                </Button>
+                            )}
+                            {ticketPhase === "board-ready" && (
+                                <Button
+                                    type="button"
+                                    className="h-12 rounded-full bg-emerald-500 text-black hover:bg-emerald-400"
+                                    onClick={handleBoarding}
+                                >
+                                    Boarding
+                                </Button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </motion.div>
         )}
         </AnimatePresence>
 
@@ -604,6 +765,40 @@ export function FocusFlight() {
                 </div>
             </div>
         )}
+
+        <AnimatePresence>
+        {screenCoverMode && (
+            <motion.div
+                className="absolute inset-0 z-40 overflow-hidden"
+                initial={{ opacity: 1 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+            >
+                <motion.div
+                    className="absolute inset-0 bg-[#02040a]"
+                    initial={{ y: "100%" }}
+                    animate={{ y: 0 }}
+                    exit={{ y: "-100%" }}
+                    transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+                />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(74,222,128,0.12),transparent_34%),radial-gradient(circle_at_bottom,rgba(59,130,246,0.16),transparent_40%)]" />
+                <motion.div
+                    className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center"
+                    initial={{ opacity: 0, y: 22 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -24 }}
+                    transition={{ duration: 0.45, delay: 0.2 }}
+                >
+                    <p className="text-xs font-semibold uppercase tracking-[0.6em] text-white/35">Focus Flight</p>
+                    <p className="mt-5 text-4xl font-semibold uppercase tracking-[0.16em] text-emerald-300 sm:text-5xl">
+                        {coverCopy.title}
+                    </p>
+                    <p className="mt-3 text-lg font-light text-blue-200/85 sm:text-xl">{coverCopy.subtitle}</p>
+                </motion.div>
+            </motion.div>
+        )}
+        </AnimatePresence>
 
         {/* ─── FLYING: Hold-to-end pill ──────────────────────────────── */}
         {isPlaying && route.length > 0 && (

@@ -100,6 +100,12 @@ interface Activity {
   color?: string;
 }
 
+export interface SeatSelectionChoice {
+  seatId: string;
+  activityId: string;
+  activityName: string;
+}
+
 const focusActivities: Activity[] = [
   { id: "focus",    name: "Focus",    icon: <MdSelfImprovement />, color: "text-purple-400" },
   { id: "work",     name: "Work",     icon: <FiMonitor />,         color: "text-slate-300" },
@@ -184,13 +190,17 @@ function Seat({
   );
 }
 
-export default function SeatSelection({ onSeatSelect }: { onSeatSelect?: () => void } = {}) {
+export default function SeatSelection({ onSeatSelect }: { onSeatSelect?: (choice: SeatSelectionChoice) => void } = {}) {
   const [seats] = useState(generateSeats);
   const [selection, setSelection] = useState<{ seat: SeatData; activity: Activity } | null>(null);
 
   const handleSelect = (seat: SeatData, activity: Activity) => {
     setSelection({ seat, activity });
-    onSeatSelect?.();
+    onSeatSelect?.({
+      seatId: seat.id,
+      activityId: activity.id,
+      activityName: activity.name,
+    });
   };
 
   const firstSeats = seats.filter((s) => s.class === SEAT_CLASSES.FIRST);

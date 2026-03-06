@@ -1,7 +1,7 @@
 import { LuPlane } from "react-icons/lu";
 import DottedMap from "dotted-map";
-import { useMemo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import { Button } from "./ui/button";
 
 interface BoardingTicketProps {
@@ -56,6 +56,7 @@ export const BoardingTicket: React.FC<BoardingTicketProps> = ({
   onTorn,
 }) => {
   const [torn, setTorn] = useState(false);
+  const [hasReportedTorn, setHasReportedTorn] = useState(false);
 
   const map = useMemo(() => {
     const m = new DottedMap({ height: 100, grid: "diagonal" });
@@ -81,15 +82,23 @@ export const BoardingTicket: React.FC<BoardingTicketProps> = ({
       : `${timefocus}m`;
 
   const handleTear = () => {
-
     if (!torn && !disableTorn) setTorn(true);
   };
 
+  useEffect(() => {
+    if (!torn || hasReportedTorn || !onTorn) {
+      return;
+    }
+
+    setHasReportedTorn(true);
+    onTorn();
+  }, [hasReportedTorn, onTorn, torn]);
+
   return (
     <div
-      className="relative w-85 select-none cursor-pointer"
+      className={`relative w-85 select-none ${disableTorn ? "cursor-default" : "cursor-pointer"}`}
       onClick={handleTear}
-      title={torn ? "" : "Click to tear"}
+      title={disableTorn || torn ? "" : "Click to tear"}
     >
       {/* ══════════ TOP HALF — main ticket body ══════════ */}
       <motion.div
@@ -208,9 +217,6 @@ export const BoardingTicket: React.FC<BoardingTicketProps> = ({
               }
             : { y: 0, x: 0, rotate: 0, opacity: 1 }
         }
-        onAnimationComplete={() => {
-          if (torn && onTorn) onTorn();
-        }}
       >
         {/* Top notch (bottom half of tear line) */}
         <div className="relative flex items-start">
