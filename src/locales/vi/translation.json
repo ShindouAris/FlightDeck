@@ -28,7 +28,13 @@
             "boarding_title": "Cửa khoang đã đóng",
             "boarding_subtitle": "Sẵn sàng cất cánh",
             "booking_title": "Chào mừng lên chuyến bay",
-            "booking_subtitle": "Hôm nay chúng ta sẽ bay đến đâu?"
+            "booking_subtitle": "Hôm nay chúng ta sẽ bay đến đâu?",
+            "greeting": {
+                "morning": "Chào buổi sáng",
+                "afternoon": "Chào buổi chiều",
+                "evening": "Chào buổi tối",
+                "night": "Chúc ngủ ngon"
+            }
         },
         "ui": {
             "departing_from": "Khởi hành từ",

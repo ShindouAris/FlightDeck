@@ -28,7 +28,13 @@
             "boarding_title": "キャビンドアが閉まりました",
             "boarding_subtitle": "離陸準備完了",
             "booking_title": "ご搭乗ありがとうございます",
-            "booking_subtitle": "本日はどちらへ向かわれますか？"
+            "booking_subtitle": "本日はどちらへ向かわれますか？",
+            "greeting": {
+                "morning": "おはようございます",
+                "afternoon": "こんにちは",
+                "evening": "こんばんは",
+                "night": "おやすみなさい"
+            }
         },
         "ui": {
             "departing_from": "出発地",

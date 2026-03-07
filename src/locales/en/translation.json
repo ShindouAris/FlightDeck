@@ -28,7 +28,13 @@
             "boarding_title": "Cabin door closed",
             "boarding_subtitle": "Ready for takeoff",
             "booking_title": "Welcome aboard",
-            "booking_subtitle": "Where are we flying today?"
+            "booking_subtitle": "Where are we flying today?",
+            "greeting": {
+                "morning": "Good morning",
+                "afternoon": "Good afternoon",
+                "evening": "Good evening",
+                "night": "Good night"
+            }
         }
         ,
         "ui": {

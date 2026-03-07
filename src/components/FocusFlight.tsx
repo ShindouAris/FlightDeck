@@ -119,6 +119,17 @@ export function FocusFlight() {
     useWakeLock()
     const { t } = useTranslation()
 
+    const getTimePeriod = (d: Date = new Date()) => {
+        const h = d.getHours()
+        if (h >= 5 && h < 12) return "morning"
+        if (h >= 12 && h < 17) return "afternoon"
+        if (h >= 17 && h < 22) return "evening"
+        return "evening"
+    }
+
+    const timePeriod = getTimePeriod()
+    const timeGreeting = t(`focus.cover.greeting.${timePeriod}`)
+
     const HOLD_TO_STOP_DURATION = 1500
     const TICKET_PRINT_DURATION = 4000
     const SCREEN_COVER_DURATION = 1800
@@ -453,7 +464,7 @@ export function FocusFlight() {
         : 0
     const coverCopy = screenCoverMode === "boarding"
         ? { title: t("focus.cover.boarding_title"), subtitle: t("focus.cover.boarding_subtitle") }
-        : { title: t("focus.cover.booking_title"), subtitle: t("focus.cover.booking_subtitle") }
+        : { title: timeGreeting, subtitle: t("focus.cover.booking_subtitle") }
 
   return (
     <Card className="w-full h-screen p-0 gap-0 overflow-hidden relative">
@@ -500,7 +511,7 @@ export function FocusFlight() {
         {bookingStep === "idle" && (
             <div className="absolute inset-0 z-20 bg-black/55 backdrop-blur-[1.5px] pointer-events-auto">
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 pointer-events-none select-none px-4">
-                    <p className="text-emerald-400 text-3xl sm:text-4xl lg:text-5xl uppercase tracking-widest font-semibold text-center">{t("focus.cover.booking_title")}</p>
+                    <p className="text-emerald-400 text-3xl sm:text-4xl lg:text-5xl uppercase tracking-widest font-semibold text-center">{timeGreeting}, User</p>
                     <p className="text-pink-300 text-base sm:text-lg lg:text-xl font-light text-center">{t("focus.cover.booking_subtitle")}</p>
                 </div>
             </div>
