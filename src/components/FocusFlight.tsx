@@ -28,6 +28,7 @@ import { BoardingTicket } from "./TicketRender";
 import { useWakeLock } from "@/hooks/use-wakelock";
 import Setting from "./Settings";
 import { IoSettingsOutline } from "react-icons/io5";
+import Counter from "./ui/Counter";
 
 const MAPBOX_ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 const HAS_MAPBOX_TOKEN = Boolean(MAPBOX_ACCESS_TOKEN);
@@ -593,13 +594,16 @@ export function FocusFlight() {
 
                         {/* Focus duration slider */}
                         <div className="space-y-4">
-                            <div className="flex items-baseline justify-between">
-                                <p className="text-white/50 text-sm">Focus Duration</p>
+                            <div className="flex items-center justify-between">
                                 <div>
-                                    <span className="text-amber-400 text-3xl font-bold tabular-nums">{draftFocusMinutes}</span>
-                                    <span className="text-white/30 text-sm ml-1">min</span>
+                                    <p className="text-white/50 text-sm">Focus Duration</p>
+                                </div>
+                                <div className="flex items-baseline gap-2">
+                                    <Counter value={draftFocusMinutes} gradientFrom="transparent" textColor="#FE9EC7" fontWeight={'bold'} fontSize={30} gap={1} />
+                                    <span className="text-white/30 text-sm">min</span>
                                 </div>
                             </div>
+                            
                             <Slider
                                 value={[draftFocusMinutes]}
                                 min={5}
@@ -607,9 +611,26 @@ export function FocusFlight() {
                                 step={5}
                                 onValueChange={(value) => setDraftFocusMinutes(value[0] ?? 30)}
                             />
+                            
                             <div className="flex justify-between text-white/20 text-[11px]">
                                 <span>5 min</span>
                                 <span>15 hrs</span>
+                            </div>
+
+                            <div className="pt-2 border-t border-white/10">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-white/30 text-sm">Landing at:</span>
+                                    <span className="text-emerald-400 text-sm font-medium">
+                                        {(() => {
+                                            const landingTime = new Date(Date.now() + draftFocusMinutes * 60 * 1000)
+                                            const isNextDay = landingTime.toDateString() !== new Date().toDateString()
+                                            const timeStr = landingTime.toLocaleString('en-US', {hour: '2-digit', minute: '2-digit'})
+                                            return isNextDay 
+                                                ? `Tomorrow ${timeStr}` 
+                                                : timeStr
+                                        })()}
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
@@ -853,11 +874,6 @@ export function FocusFlight() {
                     timeLeft={totalSecondsLeft}
                     totalTime={Math.ceil(focusTime / 1000)}
                     endTime={new Date(Date.now() + timeLeft)}
-                    button={[{
-                        title: "Settings",
-                        icon: <IoSettingsOutline />,
-                        onClick: handleOpenSettings,
-                    }]}
                     handleOpenClick={() => setActionBarOpen(o => !o)}
                 />
             </div>
