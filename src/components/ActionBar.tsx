@@ -137,7 +137,7 @@ export const ActionBar: React.FC<ActionBarProps> = ({ open,
                     <div className="flex flex-col items-end flex-1 gap-0.5">
                         <span className="text-white/30 text-[8px] uppercase tracking-[0.18em] font-semibold">Distance</span>
                         <span className="text-white/70 text-lg font-semibold tabular-nums leading-none">
-                            <Counter value={distance} places={[1000, 100, 10, 1]} gradientFrom="transparent" textColor="text-white" gap={3} fontSize={20} />
+                            <Counter value={distance} gradientFrom="transparent" textColor="text-white" gap={2} fontSize={20} />
                             <span className="text-white/25 text-xs font-normal"> nm</span>
                         </span>
                     </div>

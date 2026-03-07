@@ -25,6 +25,7 @@ import { RiPlaneFill } from "react-icons/ri";
 import { LuPlaneLanding, LuPlaneTakeoff } from "react-icons/lu";
 import { AnimatePresence, motion } from "framer-motion";
 import { BoardingTicket } from "./TicketRender";
+import { useWakeLock } from "@/hooks/use-wakelock";
 
 const MAPBOX_ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 const HAS_MAPBOX_TOKEN = Boolean(MAPBOX_ACCESS_TOKEN);
@@ -111,6 +112,7 @@ function MapFlightEndReturn({
 }
 
 export function FocusFlight() {
+    useWakeLock()
 
     const HOLD_TO_STOP_DURATION = 1500
     const TICKET_PRINT_DURATION = 4000
@@ -299,6 +301,7 @@ export function FocusFlight() {
         setHoldProgress(0)
         setActionBarOpen(true)
         stop()
+        document.exitFullscreen().then(() => {console.log("Exited fullscreen")}).catch((err) => {console.error("Error exiting fullscreen:", err)})
 
         if (currentLocation) {
             setFlightEndReturnTrigger((value) => value + 1)
@@ -345,12 +348,14 @@ export function FocusFlight() {
         setBookingStep("select-arrival")
     }
 
-    const handleGo = () => {
+
+    const handleGo = async () => {
         if (isPlaying) return
         if (route.length < 2) {
             gooeyToast.error("Please select both Departure and Arrival airports to start the Focus Flight.")
             return
         }
+        await document.documentElement.requestFullscreen()
         const audio = new Audio("/seatbelt.mp3")
         audio.volume = 0.65
         audio.play()
@@ -533,7 +538,9 @@ export function FocusFlight() {
         {bookingStep === "select-focus-time" && (
             <div className="absolute inset-0 z-20 bg-black/45 backdrop-blur-[2px] flex items-end justify-center pb-10 px-4">
                 <div className="w-full max-w-md">
-                    <div className="bg-black/80 backdrop-blur-2xl border border-white/10 rounded-3xl p-6
+                    <motion.div initial={{ y: "100%" }} animate={{ y: 0 }} exit={{y: "100%"}} transition={{ animation: {
+                        type: "spring", stiffness: 320, damping: 36, mass: 1
+                    } }} className="bg-black/80 backdrop-blur-2xl border border-white/10 rounded-3xl p-6
                                     shadow-[0_-20px_80px_rgba(0,0,0,0.6)] space-y-5">
                         {/* Departure confirmation row */}
                         <div className="flex items-center gap-3">
@@ -582,7 +589,7 @@ export function FocusFlight() {
                             <LuPlaneLanding className="text-amber-300 text-base" />
                             Set destination
                         </button>
-                    </div>
+                    </motion.div>
                 </div>
             </div>
         )}
