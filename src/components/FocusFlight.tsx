@@ -832,7 +832,7 @@ export function FocusFlight() {
                             onClick={handleGoFromBoardingCover}
                         >
                             <RiPlaneFill className="mr-2 text-lg" />
-                            Go
+                            {t("focus.buttons.go")}
                         </Button>
                     )}
                 </motion.div>

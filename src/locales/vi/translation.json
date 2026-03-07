@@ -20,7 +20,7 @@
         },
         "buttons": {
             "set_destination": "Chọn điểm đến",
-            "go": "Bắt đầu",
+            "go": "Đi thôi",
             "print_boarding": "In thẻ lên máy bay",
             "select_seat_continue": "Chọn ghế để tiếp tục"
         },
