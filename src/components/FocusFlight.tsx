@@ -29,6 +29,7 @@ import { useWakeLock } from "@/hooks/use-wakelock";
 import Setting from "./Settings";
 import { IoSettingsOutline } from "react-icons/io5";
 import Counter from "./ui/Counter";
+import { useTranslation } from "react-i18next";
 
 const MAPBOX_ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 const HAS_MAPBOX_TOKEN = Boolean(MAPBOX_ACCESS_TOKEN);
@@ -116,6 +117,7 @@ function MapFlightEndReturn({
 
 export function FocusFlight() {
     useWakeLock()
+    const { t } = useTranslation()
 
     const HOLD_TO_STOP_DURATION = 1500
     const TICKET_PRINT_DURATION = 4000
@@ -206,14 +208,14 @@ export function FocusFlight() {
 
     const getLocation = () => {
         if (!navigator.geolocation) {
-            console.error("Geolocation is not supported by this browser.")
+            console.error(t("focus.errors.geolocation_unsupported"))
             return
         }
 
         navigator.geolocation.getCurrentPosition((pos) => {
             setCurrentLocation([[pos.coords.longitude, pos.coords.latitude]])
         }, (error) => {
-            console.error("Error getting geolocation:", error)
+            console.error(t("focus.errors.geolocation_error"), error)
         })
     }
 
@@ -332,14 +334,14 @@ export function FocusFlight() {
     const handleAirportClick = (airport: Airport) => {
         if (bookingStep === "select-departure") {
             if (selectedArAirport?.id === airport.id) {
-                gooeyToast.error("Departure and Arrival cannot be the same airport!")
+                gooeyToast.error(t("focus.errors.same_airport"))
                 return
             }
             setSelectedDpAirport(airport)
             setBookingStep("select-focus-time")
         } else if (bookingStep === "select-arrival") {
             if (selectedDpAirport?.id === airport.id) {
-                gooeyToast.error("Departure and Arrival cannot be the same airport!")
+                gooeyToast.error(t("focus.errors.same_airport"))
                 return
             }
             setSelectedArAirport(airport)
@@ -360,7 +362,7 @@ export function FocusFlight() {
     const handleGo = async () => {
         if (isPlaying) return
         if (route.length < 2) {
-            gooeyToast.error("Please select both Departure and Arrival airports to start the Focus Flight.")
+            gooeyToast.error(t("focus.errors.select_both_airports"))
             return false
         }
         try {
@@ -376,7 +378,7 @@ export function FocusFlight() {
             return true
         } catch (error) {
             console.error("Error starting focus flight:", error)
-            gooeyToast.error("Unable to start the focus flight.")
+            gooeyToast.error(t("focus.errors.unable_to_start"))
             return false
         }
     }
@@ -450,8 +452,8 @@ export function FocusFlight() {
         ))
         : 0
     const coverCopy = screenCoverMode === "boarding"
-        ? { title: "Cabin door closed", subtitle: "Ready for takeoff" }
-        : { title: "Welcome aboard", subtitle: "Where are we flying today?" }
+        ? { title: t("focus.cover.boarding_title"), subtitle: t("focus.cover.boarding_subtitle") }
+        : { title: t("focus.cover.booking_title"), subtitle: t("focus.cover.booking_subtitle") }
 
   return (
     <Card className="w-full h-screen p-0 gap-0 overflow-hidden relative">
@@ -498,8 +500,8 @@ export function FocusFlight() {
         {bookingStep === "idle" && (
             <div className="absolute inset-0 z-20 bg-black/55 backdrop-blur-[1.5px] pointer-events-auto">
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 pointer-events-none select-none px-4">
-                    <p className="text-emerald-400 text-3xl sm:text-4xl lg:text-5xl uppercase tracking-widest font-semibold text-center">Welcome aboard</p>
-                    <p className="text-pink-300 text-base sm:text-lg lg:text-xl font-light text-center">Where are we flying today?</p>
+                    <p className="text-emerald-400 text-3xl sm:text-4xl lg:text-5xl uppercase tracking-widest font-semibold text-center">{t("focus.cover.booking_title")}</p>
+                    <p className="text-pink-300 text-base sm:text-lg lg:text-xl font-light text-center">{t("focus.cover.booking_subtitle")}</p>
                 </div>
             </div>
         )}
@@ -519,7 +521,7 @@ export function FocusFlight() {
                                transition-all duration-300"
                 >
                     <RiPlaneFill className="text-amber-400 text-lg transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                    <span>Book my flight</span>
+                    <span>{t("buttons.book_flight")}</span>
                 </button>
             </div>
         )}
@@ -532,7 +534,7 @@ export function FocusFlight() {
                     className="flex items-center gap-2 rounded-2xl border border-white/12 bg-black/60 px-4 py-3 text-sm font-medium text-white/75 backdrop-blur-xl transition-all duration-300 hover:border-white/20 hover:bg-black/72 hover:text-white"
                 >
                     <IoSettingsOutline className="text-base" />
-                    <span>Settings</span>
+                    <span>{t("buttons.settings")}</span>
                 </button>
             </div>
         )}
@@ -544,8 +546,8 @@ export function FocusFlight() {
                     <span className={`w-2 h-2 rounded-full shrink-0 animate-pulse ${bookingStep === "select-departure" ? "bg-amber-400" : "bg-violet-400"}`} />
                     <span className="text-white/80 text-sm font-medium whitespace-nowrap">
                         {bookingStep === "select-departure"
-                            ? "Click a marker to set departure airport"
-                            : "Click a marker to set arrival airport"}
+                            ? t("focus.hints.click_set_departure")
+                            : t("focus.hints.click_set_arrival")}
                     </span>
                 </div>
             </div>
@@ -584,7 +586,7 @@ export function FocusFlight() {
                                 <LuPlaneTakeoff className="text-emerald-400 text-base" />
                             </div>
                             <div className="min-w-0">
-                                <p className="text-white/30 text-[10px] uppercase tracking-widest font-semibold">Departing from</p>
+                                    <p className="text-white/30 text-[10px] uppercase tracking-widest font-semibold">{t("focus.ui.departing_from")}</p>
                                 <p className="text-white/80 text-sm font-semibold">{selectedDpAirport?.name}</p>
                                 <p className="text-white/40 text-xs">{selectedDpAirport?.iata_code || selectedDpAirport?.ident}</p>
                             </div>
@@ -596,11 +598,11 @@ export function FocusFlight() {
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-white/50 text-sm">Focus Duration</p>
+                                    <p className="text-white/50 text-sm">{t("focus.ui.focus_duration")}</p>
                                 </div>
                                 <div className="flex items-baseline gap-2">
                                     <Counter value={draftFocusMinutes} gradientFrom="transparent" textColor="#FE9EC7" fontWeight={'bold'} fontSize={30} gap={1} />
-                                    <span className="text-white/30 text-sm">min</span>
+                                    <span className="text-white/30 text-sm">{t("focus.ui.min")}</span>
                                 </div>
                             </div>
                             
@@ -613,8 +615,8 @@ export function FocusFlight() {
                             />
                             
                             <div className="flex justify-between text-white/20 text-[11px]">
-                                <span>5 min</span>
-                                <span>15 hrs</span>
+                                <span>{t("focus.ui.min_short")}</span>
+                                <span>{t("focus.ui.max_short")}</span>
                             </div>
 
                             <div className="pt-2 border-t border-white/10">
@@ -643,7 +645,7 @@ export function FocusFlight() {
                                        transition-all duration-200"
                         >
                             <LuPlaneLanding className="text-amber-300 text-base" />
-                            Set destination
+                                {t("focus.buttons.set_destination")}
                         </button>
                     </motion.div>
                 </div>
@@ -675,7 +677,7 @@ export function FocusFlight() {
                     <div className="absolute top-5 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
                         <div className="flex items-center gap-2.5 px-5 py-2.5 rounded-full backdrop-blur-xl border border-white/10 shadow-lg">
                             <span className="w-2 h-2 rounded-full shrink-0 animate-pulse bg-blue-400" />
-                            <span className="text-white/80 text-sm font-medium whitespace-nowrap">Choose your seat</span>
+                            <span className="text-white/80 text-sm font-medium whitespace-nowrap">{t("focus.ui.choose_your_seat")}</span>
                         </div>
                     </div>
 
@@ -696,7 +698,7 @@ export function FocusFlight() {
                                 }`}
                         >
                             <RiPlaneFill className={`text-lg ${isSeatSelected ? "text-emerald-300" : "text-white/20"}`} />
-                            {isSeatSelected ? "Print boarding ticket" : "Select a seat to continue"}
+                            {isSeatSelected ? t("focus.buttons.print_boarding") : t("focus.buttons.select_seat_continue")}
                         </button>
                     </div>
                 </motion.div>
@@ -739,16 +741,16 @@ export function FocusFlight() {
                         <p className="text-[10px] uppercase tracking-[0.45em] text-white/35">Gate workflow</p>
                         <div className="mt-4 space-y-3">
                             <p className="text-3xl font-semibold tracking-tight text-white">
-                                {ticketPhase === "printing" && "Printing boarding pass"}
-                                {ticketPhase === "printed" && "Boarding pass ready"}
-                                {ticketPhase === "tear-ready" && "Check in complete"}
-                                {ticketPhase === "board-ready" && "Gate cleared"}
+                                {ticketPhase === "printing" && t("focus.ticket.phases.printing.title")}
+                                {ticketPhase === "printed" && t("focus.ticket.phases.printed.title")}
+                                {ticketPhase === "tear-ready" && t("focus.ticket.phases.tear-ready.title")}
+                                {ticketPhase === "board-ready" && t("focus.ticket.phases.board-ready.title")}
                             </p>
                             <p className="text-sm leading-6 text-white/60">
-                                {ticketPhase === "printing" && `Preparing seat ${seatSelection.seatId} for ${seatSelection.activityName.toLowerCase()} mode.`}
-                                {ticketPhase === "printed" && "Use check in to unlock the tear line on your boarding ticket."}
-                                {ticketPhase === "tear-ready" && "Tear the ticket stub to reveal the final boarding step."}
-                                {ticketPhase === "board-ready" && "Proceed to boarding. The cabin cover will close before takeoff."}
+                                {ticketPhase === "printing" && `${t("focus.ticket.phases.printing.desc")} ${seatSelection ? `${seatSelection.seatId} ${seatSelection.activityName.toLowerCase()}` : ""}`}
+                                {ticketPhase === "printed" && t("focus.ticket.phases.printed.desc")}
+                                {ticketPhase === "tear-ready" && t("focus.ticket.phases.tear-ready.desc")}
+                                {ticketPhase === "board-ready" && t("focus.ticket.phases.board-ready.desc")}
                             </p>
                         </div>
 
@@ -849,7 +851,7 @@ export function FocusFlight() {
                         />
                     )}
                     <span className="relative z-10">
-                        {isHoldingStop ? "Hold to end focus session" : "Hold to end flight"}
+                        {isHoldingStop ? t("focus.ui.hold_to_end_focus") : t("focus.ui.hold_to_end_flight")}
                     </span>
                 </button>
             </div>
@@ -900,10 +902,10 @@ export function FocusFlight() {
             >
                 <DialogHeader className="gap-3 text-left">
                     <DialogTitle className="text-2xl font-semibold tracking-tight text-emerald-300">
-                        Focus flight ended
+                        {t("focus.dialog.flight_ended_title")}
                     </DialogTitle>
                     <DialogDescription className="text-sm leading-6 text-white/65">
-                        Your focus flight session is complete. Would you like to create another session or exit back to the main screen?
+                        {t("focus.dialog.flight_ended_desc")}
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter className="mt-2 flex-col gap-3 sm:flex-row sm:justify-end">
@@ -913,14 +915,14 @@ export function FocusFlight() {
                         className="border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white"
                         onClick={handleExitToMainScreen}
                     >
-                        Exit to main screen
+                        {t("focus.dialog.exit_main")}
                     </Button>
                     <Button
                         type="button"
                         className="bg-emerald-500 text-black hover:bg-emerald-400"
                         onClick={handleCreateAnotherSession}
                     >
-                        Create another session
+                        {t("focus.dialog.create_another")}
                     </Button>
                 </DialogFooter>
             </DialogContent>

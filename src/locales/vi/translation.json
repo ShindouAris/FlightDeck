@@ -1,0 +1,131 @@
+{
+    "welcome": "Chào mừng lên chuyến bay",
+    "welcome_subtitle": "Hôm nay bạn muốn bay đến đâu?",
+    "buttons": {
+        "book_flight": "Đặt chuyến bay",
+        "settings": "Cài đặt"
+    },
+    "departing": "Khởi hành",
+    "focus": {
+        "errors": {
+            "same_airport": "Sân bay khởi hành và sân bay đến không thể giống nhau!",
+            "geolocation_unsupported": "Trình duyệt này không hỗ trợ định vị.",
+            "geolocation_error": "Lỗi khi lấy vị trí địa lý:",
+            "select_both_airports": "Vui lòng chọn cả sân bay khởi hành và sân bay đến để bắt đầu chuyến bay tập trung.",
+            "unable_to_start": "Không thể bắt đầu chuyến bay tập trung."
+        },
+        "hints": {
+            "click_set_departure": "Nhấn vào một điểm đánh dấu để đặt sân bay khởi hành",
+            "click_set_arrival": "Nhấn vào một điểm đánh dấu để đặt sân bay đến"
+        },
+        "buttons": {
+            "set_destination": "Chọn điểm đến",
+            "go": "Bắt đầu",
+            "print_boarding": "In thẻ lên máy bay",
+            "select_seat_continue": "Chọn ghế để tiếp tục"
+        },
+        "cover": {
+            "boarding_title": "Cửa khoang đã đóng",
+            "boarding_subtitle": "Sẵn sàng cất cánh",
+            "booking_title": "Chào mừng lên chuyến bay",
+            "booking_subtitle": "Hôm nay chúng ta sẽ bay đến đâu?"
+        },
+        "ui": {
+            "departing_from": "Khởi hành từ",
+            "focus_duration": "Thời gian tập trung",
+            "landing_at": "Hạ cánh lúc:",
+            "min": "phút",
+            "min_short": "5 phút",
+            "max_short": "15 giờ",
+            "choose_your_seat": "Chọn ghế của bạn",
+            "hold_to_end_focus": "Giữ để kết thúc phiên tập trung",
+            "hold_to_end_flight": "Giữ để kết thúc chuyến bay"
+        },
+        "ticket": {
+            "phases": {
+                "printing": {
+                    "title": "Đang in thẻ lên máy bay",
+                    "desc": "Chuẩn bị chỗ ngồi cho chế độ đã chọn."
+                },
+                "printed": {
+                    "title": "Thẻ lên máy bay đã sẵn sàng",
+                    "desc": "Sử dụng Check-in để mở khóa đường xé trên vé."
+                },
+                "tear-ready": {
+                    "title": "Check-in hoàn tất",
+                    "desc": "Xé phần cuống vé để mở bước lên máy bay cuối cùng."
+                },
+                "board-ready": {
+                    "title": "Cổng đã mở",
+                    "desc": "Tiến hành lên máy bay. Màn hình cabin sẽ đóng trước khi cất cánh."
+                }
+            }
+        },
+        "dialog": {
+            "flight_ended_title": "Chuyến bay tập trung đã kết thúc",
+            "flight_ended_desc": "Phiên tập trung của bạn đã hoàn tất. Bạn muốn tạo một phiên mới hay quay lại màn hình chính?",
+            "exit_main": "Quay về màn hình chính",
+            "create_another": "Tạo phiên mới"
+        }
+    },
+    "settings": {
+        "title": "Cài đặt",
+        "manage_prefs": "Quản lý các tùy chọn của bạn",
+        "select_setting": "Chọn một mục để cấu hình",
+        "footer_version": "FocusFlight v0.0.1",
+        "categories": {
+            "general": {
+                "label": "Chung",
+                "description": "Hành vi ứng dụng & ngôn ngữ"
+            },
+            "appearance": {
+                "label": "Giao diện",
+                "description": "Chủ đề, màu sắc & hiển thị"
+            },
+            "notifications": {
+                "label": "Thông báo",
+                "description": "Cảnh báo & âm thanh"
+            },
+            "about": {
+                "label": "Thông tin",
+                "description": "Phiên bản & ghi nhận"
+            }
+        },
+        "sections": {
+            "behavior": "Hành vi",
+            "analytics": "Phân tích",
+            "theme": "Chủ đề",
+            "credits": "Ghi nhận"
+        },
+        "general": {
+            "launch_on_startup": "Khởi chạy khi bật máy",
+            "launch_on_startup_desc": "Mở ứng dụng khi hệ thống khởi động",
+            "language": "Ngôn ngữ",
+            "language_desc": "Chọn ngôn ngữ hiển thị của ứng dụng",
+            "time_format": "Định dạng thời gian",
+            "language_values": {
+                "en": "Tiếng Anh",
+                "vi": "Tiếng Việt"
+            }
+        },
+        "analytics": {
+            "usage_analytics": "Phân tích sử dụng",
+            "usage_analytics_desc": "Giúp cải thiện trải nghiệm ứng dụng"
+        },
+        "notifications": {
+            "push_notifications": "Thông báo đẩy",
+            "push_desc": "Nhận cập nhật theo thời gian thực",
+            "sounds": "Âm thanh thông báo",
+            "sounds_desc": "Phát âm thanh cho cảnh báo"
+        },
+        "appearance": {
+            "dark": "Tối",
+            "light": "Sáng",
+            "system": "Theo hệ thống"
+        },
+        "about": {
+            "built_with": "Được xây dựng bằng React, Mapbox GL và Framer Motion.",
+            "map_credits": "Dữ liệu bản đồ © các cộng tác viên OpenStreetMap."
+        }
+    }
+}

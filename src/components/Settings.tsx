@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useTheme } from "next-themes";
+import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Settings,
@@ -94,34 +95,70 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 /* ────────────────── Content Panel Sections ─────────────────── */
 
 function GeneralContent() {
+  const { t, i18n } = useTranslation();
   const [autoStart, setAutoStart] = useState(true);
   const [analytics, setAnalytics] = useState(false);
   const [timeFormat, setTimeFormat] = useState("24-hour");
+  const activeLanguage = i18n.resolvedLanguage === "vi" ? "vi" : "en";
+
+  const languageOptions = [
+    { code: "en", label: t("settings.general.language_values.en") },
+    { code: "vi", label: t("settings.general.language_values.vi") },
+  ] as const;
+
   return (
     <div>
-      <SectionTitle>Behavior</SectionTitle>
-      <SettingRow icon={Monitor} label="Launch on startup" description="Open app when system boots" trailing={<Toggle enabled={autoStart} onToggle={() => setAutoStart(!autoStart)} />} />
+      <SectionTitle>{t("settings.sections.behavior")}</SectionTitle>
+      <SettingRow icon={Monitor} label={t("settings.general.launch_on_startup")} description={t("settings.general.launch_on_startup_desc")} trailing={<Toggle enabled={autoStart} onToggle={() => setAutoStart(!autoStart)} />} />
       <Divider />
-      <SettingRow icon={Globe} label="Language" description="English (US)" trailing={<span className="text-red-500 font-bold">INOP</span>} />
+      <SettingRow
+        icon={Globe}
+        label={t("settings.general.language")}
+        description={t("settings.general.language_desc")}
+        trailing={(
+          <div className="flex items-center rounded-2xl border border-white/10 bg-white/5 p-1 dark:bg-white/5">
+            {languageOptions.map((option) => {
+              const isActive = option.code === activeLanguage;
+
+              return (
+                <button
+                  key={option.code}
+                  type="button"
+                  onClick={() => void i18n.changeLanguage(option.code)}
+                  className="min-w-22 rounded-xl px-3 py-2 text-xs font-semibold transition-all duration-200"
+                  style={{
+                    backgroundColor: isActive ? "#8B5CF6" : "transparent",
+                    color: isActive ? "#FFFFFF" : "var(--ff-label-inactive)",
+                    boxShadow: isActive ? "0 10px 24px rgba(139, 92, 246, 0.24)" : "none",
+                  }}
+                >
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      />
       <Divider />
-      <SettingRow icon={Clock} label="Time format" description={timeFormat} trailing={<span className="text-red-500 font-bold">INOP</span>} />
-      <SectionTitle>Analytics</SectionTitle>
-      <SettingRow icon={Eye} label="Usage analytics" description="Help improve the app experience" trailing={<Toggle enabled={analytics} onToggle={() => setAnalytics(!analytics)} />} />
+      <SettingRow icon={Clock} label={t("settings.general.time_format")} description={timeFormat} trailing={<span className="text-red-500 font-bold">INOP</span>} />
+      <SectionTitle>{t("settings.sections.analytics")}</SectionTitle>
+      <SettingRow icon={Eye} label={t("settings.analytics.usage_analytics")} description={t("settings.analytics.usage_analytics_desc")} trailing={<Toggle enabled={analytics} onToggle={() => setAnalytics(!analytics)} />} />
     </div>
   );
 }
 
 function AppearanceContent() {
+  const { t } = useTranslation();
   const { theme: rawTheme, setTheme } = useTheme();
   const theme = (rawTheme ?? "dark") as "dark" | "light" | "system";
   return (
     <div>
-      <SectionTitle>Theme</SectionTitle>
+      <SectionTitle>{t("settings.sections.theme")}</SectionTitle>
       <div className="grid grid-cols-3 gap-3 mb-6">
         {([
-          { key: "dark", label: "Dark", icon: Moon },
-          { key: "light", label: "Light", icon: Sun },
-          { key: "system", label: "System", icon: Monitor },
+          { key: "dark", label: t("settings.appearance.dark"), icon: Moon },
+          { key: "light", label: t("settings.appearance.light"), icon: Sun },
+          { key: "system", label: t("settings.appearance.system"), icon: Monitor },
         ] as const).map(({ key, label, icon: ThIcon }) => (
           <button
             key={key}
@@ -146,19 +183,21 @@ function AppearanceContent() {
 }
 
 function NotificationsContent() {
+  const { t } = useTranslation();
   const [push, setPush] = useState(true);
   const [sound, setSound] = useState(true);
   return (
     <div>
-      <SectionTitle>General</SectionTitle>
-      <SettingRow icon={Bell} label="Push notifications" description="Receive real-time updates" trailing={<Toggle enabled={push} onToggle={() => setPush(!push)} />} />
+      <SectionTitle>{t("settings.sections.behavior")}</SectionTitle>
+      <SettingRow icon={Bell} label={t("settings.notifications.push_notifications")} description={t("settings.notifications.push_desc")} trailing={<Toggle enabled={push} onToggle={() => setPush(!push)} />} />
       <Divider />
-      <SettingRow icon={sound ? Volume2 : VolumeX} label="Notification sounds" description="Play audio for alerts" trailing={<Toggle enabled={sound} onToggle={() => setSound(!sound)} />} />
+      <SettingRow icon={sound ? Volume2 : VolumeX} label={t("settings.notifications.sounds")} description={t("settings.notifications.sounds_desc")} trailing={<Toggle enabled={sound} onToggle={() => setSound(!sound)} />} />
     </div>
   );
 }
 
 function AboutContent() {
+  const { t } = useTranslation();
   return (
     <div>
       <div className="flex flex-col items-center py-8 mb-4">
@@ -168,11 +207,11 @@ function AboutContent() {
         <h3 className="text-lg font-bold text-white">FocusFlight</h3>
         <p className="text-xs text-white/40 mt-1">Version 0.1.0 · Build 2026.03</p>
       </div>
-      <SectionTitle>Credits</SectionTitle>
+      <SectionTitle>{t("settings.sections.credits")}</SectionTitle>
       <div className="px-1">
         <p className="text-xs text-white/30 leading-relaxed">
-          Built with React, Mapbox GL, and Framer Motion.<br />
-          Map data © OpenStreetMap contributors.
+          {t("settings.about.built_with")}<br />
+          {t("settings.about.map_credits")}
         </p>
       </div>
     </div>
@@ -189,6 +228,7 @@ const contentMap: Record<string, React.FC> = {
 /* ──────────────────── Empty State (Desktop) ────────────────── */
 
 function EmptyState() {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-col items-center justify-center h-full select-none">
       <motion.div
@@ -207,7 +247,7 @@ function EmptyState() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15, duration: 0.4 }}
       >
-        Select a setting to configure
+        {t("settings.select_setting")}
       </motion.p>
     </div>
   );
@@ -225,6 +265,7 @@ function SidebarItem({
   onClick: () => void;
 }) {
   const Icon = category.icon;
+  const { t } = useTranslation();
   return (
     <button
       onClick={onClick}
@@ -249,10 +290,10 @@ function SidebarItem({
       </div>
       <div className="relative z-10 min-w-0">
         <span className="text-[13px] font-medium block transition-colors duration-200" style={{ color: isActive ? "#E9DFFF" : "var(--ff-label-inactive)" }}>
-          {category.label}
+          {t(`settings.categories.${category.id}.label`) || category.label}
         </span>
         <span className="text-[11px] block truncate transition-colors duration-200" style={{ color: isActive ? "#A78BFA80" : "var(--ff-desc-inactive)" }}>
-          {category.description}
+          {t(`settings.categories.${category.id}.description`) || category.description}
         </span>
       </div>
     </button>
@@ -269,6 +310,7 @@ function MobileListItem({
   onClick: () => void;
 }) {
   const Icon = category.icon;
+  const { t } = useTranslation();
   return (
     <motion.button
       onClick={onClick}
@@ -279,8 +321,8 @@ function MobileListItem({
         <Icon size={18} className="text-[#A78BFA]" />
       </div>
       <div className="flex-1 text-left min-w-0">
-        <p className="text-sm font-medium text-gray-900/88 dark:text-white/90">{category.label}</p>
-        <p className="text-xs text-gray-900/40 dark:text-white/35 mt-0.5">{category.description}</p>
+        <p className="text-sm font-medium text-gray-900/88 dark:text-white/90">{t(`settings.categories.${category.id}.label`) || category.label}</p>
+        <p className="text-xs text-gray-900/40 dark:text-white/35 mt-0.5">{t(`settings.categories.${category.id}.description`) || category.description}</p>
       </div>
       <ChevronRight size={16} className="text-gray-900/20 dark:text-white/15 shrink-0" />
     </motion.button>
@@ -313,6 +355,7 @@ interface SettingProps {
 
 export function Setting({ onClose }: SettingProps = {}) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
@@ -328,7 +371,7 @@ export function Setting({ onClose }: SettingProps = {}) {
   }, [navigate, onClose]);
 
   const ActiveContent = activeCategory ? contentMap[activeCategory] : null;
-  const activeLabel = categories.find((c) => c.id === activeCategory)?.label ?? "";
+  const activeLabel = activeCategory ? t(`settings.categories.${activeCategory}.label`) : "";
   const ActiveIcon = categories.find((c) => c.id === activeCategory)?.icon ?? Settings;
 
   /* ────────── Desktop: Master-Detail Split View ────────── */
@@ -349,8 +392,8 @@ export function Setting({ onClose }: SettingProps = {}) {
               >
                 <FaAngleLeft size={18} />
               </Button>
-              <span className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Settings</span>
-              <div className="text-xs text-gray-900/40 dark:text-white/30 mt-1">Manage your preferences</div>
+              <span className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">{t("settings.title")}</span>
+              <div className="text-xs text-gray-900/40 dark:text-white/30 mt-1">{t("settings.manage_prefs")}</div>
             </div>
           </div>
           {/* Category List */}
@@ -361,7 +404,7 @@ export function Setting({ onClose }: SettingProps = {}) {
           </nav>
           {/* Sidebar Footer */}
           <div className="px-6 py-4 border-t" style={{ borderColor: "var(--ff-border)" }}>
-            <p className="text-[10px] text-gray-900/25 dark:text-white/15 font-medium tracking-wider uppercase">FocusFlight v0.0.1</p>
+            <p className="text-[10px] text-gray-900/25 dark:text-white/15 font-medium tracking-wider uppercase">{t("settings.footer_version")}</p>
           </div>
         </aside>
 
@@ -385,7 +428,7 @@ export function Setting({ onClose }: SettingProps = {}) {
                     </div>
                     <div>
                       <h2 className="text-lg font-bold text-gray-900 dark:text-white">{activeLabel}</h2>
-                      <p className="text-xs text-gray-900/40 dark:text-white/30">{categories.find((c) => c.id === activeCategory)?.description}</p>
+                      <p className="text-xs text-gray-900/40 dark:text-white/30">{activeCategory ? t(`settings.categories.${activeCategory}.description`) : ""}</p>
                     </div>
                   </div>
                   {/* Content Body */}
@@ -420,8 +463,8 @@ export function Setting({ onClose }: SettingProps = {}) {
             <div className="px-5 pt-14 pb-3">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Settings</h1>
-                  <p className="text-xs text-gray-900/40 dark:text-white/30 mt-1">Manage your preferences</p>
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">{t("settings.title")}</h1>
+                  <p className="text-xs text-gray-900/40 dark:text-white/30 mt-1">{t("settings.manage_prefs")}</p>
                 </div>
                 <Button
                   type="button"
@@ -448,7 +491,7 @@ export function Setting({ onClose }: SettingProps = {}) {
               ))}
             </div>
             <div className="px-5 py-8">
-              <p className="text-[10px] text-gray-900/25 dark:text-white/15 text-center font-medium tracking-wider uppercase">FocusFlight v0.0.1</p>
+              <p className="text-[10px] text-gray-900/25 dark:text-white/15 text-center font-medium tracking-wider uppercase">{t("settings.footer_version")}</p>
             </div>
           </motion.div>
         ) : (

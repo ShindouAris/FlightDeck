@@ -4,6 +4,7 @@ import './index.css'
 import App from './App.tsx'
 import { GooeyToaster } from 'goey-toast'
 import "goey-toast/styles.css"
+import './i18n.ts'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

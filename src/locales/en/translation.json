@@ -1,0 +1,109 @@
+{
+    "welcome": "Welcome aboard",
+    "welcome_subtitle": "Where are we flying to today?",
+    "buttons": {
+        "book_flight": "Book my flight",
+        "settings": "Settings"
+    },
+    "departing": "Departing",
+    "focus": {
+        "errors": {
+            "same_airport": "Departure and Arrival cannot be the same airport!",
+            "geolocation_unsupported": "Geolocation is not supported by this browser.",
+            "geolocation_error": "Error getting geolocation:",
+            "select_both_airports": "Please select both Departure and Arrival airports to start the Focus Flight.",
+            "unable_to_start": "Unable to start the focus flight."
+        },
+        "hints": {
+            "click_set_departure": "Click a marker to set departure airport",
+            "click_set_arrival": "Click a marker to set arrival airport"
+        },
+        "buttons": {
+            "set_destination": "Set destination",
+            "go": "Go",
+            "print_boarding": "Print boarding ticket",
+            "select_seat_continue": "Select a seat to continue"
+        },
+        "cover": {
+            "boarding_title": "Cabin door closed",
+            "boarding_subtitle": "Ready for takeoff",
+            "booking_title": "Welcome aboard",
+            "booking_subtitle": "Where are we flying today?"
+        }
+        ,
+        "ui": {
+            "departing_from": "Departing from",
+            "focus_duration": "Focus Duration",
+            "landing_at": "Landing at:",
+            "min": "min",
+            "min_short": "5 min",
+            "max_short": "15 hrs",
+            "choose_your_seat": "Choose your seat",
+            "hold_to_end_focus": "Hold to end focus session",
+            "hold_to_end_flight": "Hold to end flight"
+        },
+        "ticket": {
+            "phases": {
+                "printing": { "title": "Printing boarding pass", "desc": "Preparing seat for selected mode." },
+                "printed": { "title": "Boarding pass ready", "desc": "Use check in to unlock the tear line on your boarding ticket." },
+                "tear-ready": { "title": "Check in complete", "desc": "Tear the ticket stub to reveal the final boarding step." },
+                "board-ready": { "title": "Gate cleared", "desc": "Proceed to boarding. The cabin cover will close before takeoff." }
+            }
+        },
+        "dialog": {
+            "flight_ended_title": "Focus flight ended",
+            "flight_ended_desc": "Your focus flight session is complete. Would you like to create another session or exit back to the main screen?",
+            "exit_main": "Exit to main screen",
+            "create_another": "Create another session"
+        }
+    },
+    "settings": {
+        "title": "Settings",
+        "manage_prefs": "Manage your preferences",
+        "select_setting": "Select a setting to configure",
+        "footer_version": "FocusFlight v0.0.1",
+        "categories": {
+            "general": { "label": "General", "description": "App behavior & language" },
+            "appearance": { "label": "Appearance", "description": "Theme, colors & display" },
+            "notifications": { "label": "Notifications", "description": "Alerts & sounds" },
+            "about": { "label": "About", "description": "Version & credits" }
+        },
+        "sections": {
+            "behavior": "Behavior",
+            "analytics": "Analytics",
+            "theme": "Theme",
+            "credits": "Credits"
+        },
+        "general": {
+            "launch_on_startup": "Launch on startup",
+            "launch_on_startup_desc": "Open app when system boots",
+            "language": "Language",
+            "language_desc": "Choose the app display language",
+            "time_format": "Time format",
+            "language_values": {
+                "en": "English",
+                "vi": "Vietnamese"
+            }
+        },
+        "analytics": {
+            "usage_analytics": "Usage analytics",
+            "usage_analytics_desc": "Help improve the app experience"
+        },
+        "notifications": {
+            "push_notifications": "Push notifications",
+            "push_desc": "Receive real-time updates",
+            "sounds": "Notification sounds",
+            "sounds_desc": "Play audio for alerts"
+        },
+        "appearance": {
+            "dark": "Dark",
+            "light": "Light",
+            "system": "System"
+        },
+        "about": {
+            "built_with": "Built with React, Mapbox GL, and Framer Motion.",
+            "map_credits": "Map data © OpenStreetMap contributors."
+        }
+    }
+    
+}
