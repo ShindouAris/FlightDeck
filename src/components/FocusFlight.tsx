@@ -26,6 +26,8 @@ import { LuPlaneLanding, LuPlaneTakeoff } from "react-icons/lu";
 import { AnimatePresence, motion } from "framer-motion";
 import { BoardingTicket } from "./TicketRender";
 import { useWakeLock } from "@/hooks/use-wakelock";
+import Setting from "./Settings";
+import { IoSettingsOutline } from "react-icons/io5";
 
 const MAPBOX_ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 const HAS_MAPBOX_TOKEN = Boolean(MAPBOX_ACCESS_TOKEN);
@@ -136,6 +138,7 @@ export function FocusFlight() {
     const [actionBarOpen, setActionBarOpen] = useState(true)
     const [flightEndReturnTrigger, setFlightEndReturnTrigger] = useState(0)
     const [showFlightEndedDialog, setShowFlightEndedDialog] = useState(false)
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false)
     const holdTimeoutRef = useRef<number | null>(null)
     const holdProgressIntervalRef = useRef<number | null>(null)
     const currentMarkerLocationRef = useRef<[number, number] | null>(null)
@@ -217,6 +220,14 @@ export function FocusFlight() {
 
     const handleBeginBooking = () => {
         setScreenCoverMode("booking")
+    }
+
+    const handleOpenSettings = () => {
+        setIsSettingsOpen(true)
+    }
+
+    const handleCloseSettings = () => {
+        setIsSettingsOpen(false)
     }
 
     const handleSeatSelect = (choice: SeatSelectionChoice) => {
@@ -512,6 +523,19 @@ export function FocusFlight() {
             </div>
         )}
 
+        {bookingStep === "idle" && !screenCoverMode && (
+            <div className="absolute top-5 right-5 z-30">
+                <button
+                    type="button"
+                    onClick={handleOpenSettings}
+                    className="flex items-center gap-2 rounded-2xl border border-white/12 bg-black/60 px-4 py-3 text-sm font-medium text-white/75 backdrop-blur-xl transition-all duration-300 hover:border-white/20 hover:bg-black/72 hover:text-white"
+                >
+                    <IoSettingsOutline className="text-base" />
+                    <span>Settings</span>
+                </button>
+            </div>
+        )}
+
         {/* ─── SELECT DEPARTURE / ARRIVAL: Step hint pill ───────────── */}
         {(bookingStep === "select-departure" || bookingStep === "select-arrival") && (
             <div className="absolute top-5 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
@@ -707,7 +731,12 @@ export function FocusFlight() {
                             </p>
                         </div>
 
-                        <div className="mt-6 flex flex-col gap-3">
+                        <motion.div
+                        initial={{ scaleY: 0.2, scaleX: 0.6, borderRadius: "2px", opacity: 0 }}
+                        animate={{ scaleY: 1, scaleX: 1, borderRadius: "12px", opacity: 1 }}
+                        transition={{ duration: 0.4, ease: "easeOut", type : "spring", stiffness: 320, damping: 36 }}
+
+                         className="mt-6 flex flex-col gap-3">
                             {ticketPhase === "printed" && (
                                 <Button
                                     type="button"
@@ -726,7 +755,7 @@ export function FocusFlight() {
                                     Boarding
                                 </Button>
                             )}
-                        </div>
+                        </motion.div>
                     </div>
                 </div>
             </motion.div>
@@ -824,10 +853,29 @@ export function FocusFlight() {
                     timeLeft={totalSecondsLeft}
                     totalTime={Math.ceil(focusTime / 1000)}
                     endTime={new Date(Date.now() + timeLeft)}
+                    button={[{
+                        title: "Settings",
+                        icon: <IoSettingsOutline />,
+                        onClick: handleOpenSettings,
+                    }]}
                     handleOpenClick={() => setActionBarOpen(o => !o)}
                 />
             </div>
         )}
+
+        <AnimatePresence>
+        {isSettingsOpen && (
+            <motion.div
+                className="absolute inset-0 z-50"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+            >
+                <Setting onClose={handleCloseSettings} />
+            </motion.div>
+        )}
+        </AnimatePresence>
 
         <Dialog open={showFlightEndedDialog}>
             <DialogContent

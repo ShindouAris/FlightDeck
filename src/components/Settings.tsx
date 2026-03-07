@@ -1,14 +1,12 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useNavigate } from "react-router";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Settings,
   Palette,
   Bell,
-  Shield,
   Plane,
-  Map,
-  Database,
   Info,
   ChevronRight,
   ChevronLeft,
@@ -18,20 +16,11 @@ import {
   Eye,
   Volume2,
   VolumeX,
-  Lock,
-  Fingerprint,
-  Navigation,
-  Layers,
-  Trash2,
-  Download,
   HelpCircle,
   ExternalLink,
-  ToggleLeft,
-  ToggleRight,
   Monitor,
-  Wifi,
   Clock,
-  MapPin,
+  X,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Switch } from "./ui/switch";
@@ -51,10 +40,6 @@ const categories: SettingCategory[] = [
   { id: "general", label: "General", icon: Settings, description: "App behavior & language" },
   { id: "appearance", label: "Appearance", icon: Palette, description: "Theme, colors & display" },
   { id: "notifications", label: "Notifications", icon: Bell, description: "Alerts & sounds" },
-  { id: "privacy", label: "Privacy & Security", icon: Shield, description: "Data protection" },
-  { id: "tracking", label: "Flight Tracking", icon: Plane, description: "Tracking preferences" },
-  { id: "map", label: "Map Display", icon: Map, description: "Map layers & style" },
-  { id: "data", label: "Data & Storage", icon: Database, description: "Cache & exports" },
   { id: "about", label: "About", icon: Info, description: "Version & credits" },
 ];
 
@@ -112,14 +97,15 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 function GeneralContent() {
   const [autoStart, setAutoStart] = useState(true);
   const [analytics, setAnalytics] = useState(false);
+  const [timeFormat, setTimeFormat] = useState("24-hour");
   return (
     <div>
       <SectionTitle>Behavior</SectionTitle>
       <SettingRow icon={Monitor} label="Launch on startup" description="Open app when system boots" trailing={<Toggle enabled={autoStart} onToggle={() => setAutoStart(!autoStart)} />} />
       <Divider />
-      <SettingRow icon={Globe} label="Language" description="English (US)" trailing={<ChevronRight size={16} className="text-white/20" />} />
+      <SettingRow icon={Globe} label="Language" description="English (US)" trailing={<span className="text-red-500 font-bold">INOP</span>} />
       <Divider />
-      <SettingRow icon={Clock} label="Time format" description="24-hour" trailing={<ChevronRight size={16} className="text-white/20" />} />
+      <SettingRow icon={Clock} label="Time format" description={timeFormat} trailing={<span className="text-red-500 font-bold">INOP</span>} />
       <SectionTitle>Analytics</SectionTitle>
       <SettingRow icon={Eye} label="Usage analytics" description="Help improve the app experience" trailing={<Toggle enabled={analytics} onToggle={() => setAnalytics(!analytics)} />} />
     </div>
@@ -156,20 +142,6 @@ function AppearanceContent() {
           </button>
         ))}
       </div>
-      <SectionTitle>Accent Color</SectionTitle>
-      <div className="flex gap-3 px-1 mb-2">
-        {["#8B5CF6", "#EC4899", "#06B6D4", "#10B981", "#F59E0B", "#EF4444"].map((color) => (
-          <button
-            key={color}
-            className="w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 cursor-pointer"
-            style={{
-              backgroundColor: color,
-              borderColor: color === "#8B5CF6" ? "#ffffff" : "transparent",
-              boxShadow: color === "#8B5CF6" ? `0 0 12px ${color}60` : "none",
-            }}
-          />
-        ))}
-      </div>
     </div>
   );
 }
@@ -177,91 +149,12 @@ function AppearanceContent() {
 function NotificationsContent() {
   const [push, setPush] = useState(true);
   const [sound, setSound] = useState(true);
-  const [flightAlerts, setFlightAlerts] = useState(true);
-  const [delayAlerts, setDelayAlerts] = useState(false);
   return (
     <div>
       <SectionTitle>General</SectionTitle>
       <SettingRow icon={Bell} label="Push notifications" description="Receive real-time updates" trailing={<Toggle enabled={push} onToggle={() => setPush(!push)} />} />
       <Divider />
       <SettingRow icon={sound ? Volume2 : VolumeX} label="Notification sounds" description="Play audio for alerts" trailing={<Toggle enabled={sound} onToggle={() => setSound(!sound)} />} />
-      <SectionTitle>Flight Alerts</SectionTitle>
-      <SettingRow icon={Plane} label="Departure alerts" description="Notify before scheduled departure" trailing={<Toggle enabled={flightAlerts} onToggle={() => setFlightAlerts(!flightAlerts)} />} />
-      <Divider />
-      <SettingRow icon={Clock} label="Delay notifications" description="Alert on status changes" trailing={<Toggle enabled={delayAlerts} onToggle={() => setDelayAlerts(!delayAlerts)} />} />
-    </div>
-  );
-}
-
-function PrivacyContent() {
-  const [biometric, setBiometric] = useState(false);
-  const [locationHistory, setLocationHistory] = useState(true);
-  return (
-    <div>
-      <SectionTitle>Authentication</SectionTitle>
-      <SettingRow icon={Fingerprint} label="Biometric unlock" description="Use fingerprint or face ID" trailing={<Toggle enabled={biometric} onToggle={() => setBiometric(!biometric)} />} />
-      <Divider />
-      <SettingRow icon={Lock} label="Change passcode" trailing={<ChevronRight size={16} className="text-white/20" />} />
-      <SectionTitle>Data</SectionTitle>
-      <SettingRow icon={MapPin} label="Location history" description="Store visited airports" trailing={<Toggle enabled={locationHistory} onToggle={() => setLocationHistory(!locationHistory)} />} />
-      <Divider />
-      <SettingRow icon={Trash2} label="Clear search history" trailing={<span className="text-xs text-red-400/80 font-medium">Clear</span>} />
-    </div>
-  );
-}
-
-function TrackingContent() {
-  const [liveTracking, setLiveTracking] = useState(true);
-  const [autoRefresh, setAutoRefresh] = useState(true);
-  return (
-    <div>
-      <SectionTitle>Live Tracking</SectionTitle>
-      <SettingRow icon={Navigation} label="Live flight tracking" description="Real-time position updates" trailing={<Toggle enabled={liveTracking} onToggle={() => setLiveTracking(!liveTracking)} />} />
-      <Divider />
-      <SettingRow icon={Wifi} label="Auto-refresh" description="Update every 30 seconds" trailing={<Toggle enabled={autoRefresh} onToggle={() => setAutoRefresh(!autoRefresh)} />} />
-      <SectionTitle>Display</SectionTitle>
-      <SettingRow icon={Layers} label="Aircraft labels" description="Show flight number overlay" trailing={<ChevronRight size={16} className="text-white/20" />} />
-      <Divider />
-      <SettingRow icon={Plane} label="Trail length" description="Medium (5 min)" trailing={<ChevronRight size={16} className="text-white/20" />} />
-    </div>
-  );
-}
-
-function MapContent() {
-  const [terrain, setTerrain] = useState(false);
-  const [satellite, setSatellite] = useState(false);
-  return (
-    <div>
-      <SectionTitle>Map Style</SectionTitle>
-      <SettingRow icon={Globe} label="Map theme" description="Dark vector" trailing={<ChevronRight size={16} className="text-white/20" />} />
-      <Divider />
-      <SettingRow icon={Layers} label="3D terrain" description="Render elevation data" trailing={<Toggle enabled={terrain} onToggle={() => setTerrain(!terrain)} />} />
-      <Divider />
-      <SettingRow icon={Map} label="Satellite overlay" description="Show satellite imagery" trailing={<Toggle enabled={satellite} onToggle={() => setSatellite(!satellite)} />} />
-      <SectionTitle>Points of Interest</SectionTitle>
-      <SettingRow icon={MapPin} label="Airport markers" description="Show on map" trailing={<Toggle enabled={true} onToggle={() => {}} />} />
-    </div>
-  );
-}
-
-function DataContent() {
-  return (
-    <div>
-      <SectionTitle>Cache</SectionTitle>
-      <SettingRow
-        icon={Database}
-        label="Cached data"
-        description="124 MB stored locally"
-        trailing={<span className="text-xs text-[#A78BFA] font-medium cursor-pointer hover:text-[#C4B5FD] transition-colors">Clear</span>}
-      />
-      <SectionTitle>Export</SectionTitle>
-      <SettingRow icon={Download} label="Export flight history" description="Download as CSV" trailing={<ChevronRight size={16} className="text-white/20" />} />
-      <Divider />
-      <SettingRow icon={Download} label="Export saved routes" description="Download as JSON" trailing={<ChevronRight size={16} className="text-white/20" />} />
-      <SectionTitle>Danger Zone</SectionTitle>
-      <div className="rounded-2xl border border-red-500/10 bg-red-500/3 p-4 mt-1">
-        <SettingRow icon={Trash2} label="Delete all data" description="This action cannot be undone" trailing={<span className="text-xs text-red-400 font-medium cursor-pointer">Delete</span>} />
-      </div>
     </div>
   );
 }
@@ -274,14 +167,8 @@ function AboutContent() {
           <Plane size={28} className="text-white" />
         </div>
         <h3 className="text-lg font-bold text-white">FocusFlight</h3>
-        <p className="text-xs text-white/40 mt-1">Version 0.0.1 · Build 2026.03</p>
+        <p className="text-xs text-white/40 mt-1">Version 0.1.0 · Build 2026.03</p>
       </div>
-      <SectionTitle>Links</SectionTitle>
-      <SettingRow icon={HelpCircle} label="Help Center" trailing={<ExternalLink size={14} className="text-white/20" />} />
-      <Divider />
-      <SettingRow icon={ExternalLink} label="Privacy Policy" trailing={<ExternalLink size={14} className="text-white/20" />} />
-      <Divider />
-      <SettingRow icon={ExternalLink} label="Terms of Service" trailing={<ExternalLink size={14} className="text-white/20" />} />
       <SectionTitle>Credits</SectionTitle>
       <div className="px-1">
         <p className="text-xs text-white/30 leading-relaxed">
@@ -297,10 +184,6 @@ const contentMap: Record<string, React.FC> = {
   general: GeneralContent,
   appearance: AppearanceContent,
   notifications: NotificationsContent,
-  privacy: PrivacyContent,
-  tracking: TrackingContent,
-  map: MapContent,
-  data: DataContent,
   about: AboutContent,
 };
 
@@ -409,24 +292,41 @@ function MobileListItem({
 
 function useMediaQuery(query: string) {
   const [matches, setMatches] = useState(() => typeof window !== "undefined" && window.matchMedia(query).matches);
-  useState(() => {
+
+  useEffect(() => {
     if (typeof window === "undefined") return;
+
     const mql = window.matchMedia(query);
     const handler = (e: MediaQueryListEvent) => setMatches(e.matches);
     mql.addEventListener("change", handler);
+
     return () => mql.removeEventListener("change", handler);
-  });
+  }, [query]);
+
   return matches;
 }
 
 /* ══════════════════════ Main Component ══════════════════════ */
 
-export function Setting() {
+interface SettingProps {
+  onClose?: () => void;
+}
+
+export function Setting({ onClose }: SettingProps = {}) {
+  const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const handleSelect = useCallback((id: string) => setActiveCategory(id), []);
   const handleBack = useCallback(() => setActiveCategory(null), []);
+  const handleClose = useCallback(() => {
+    if (onClose) {
+      onClose();
+      return;
+    }
+
+    navigate("/");
+  }, [navigate, onClose]);
 
   const ActiveContent = activeCategory ? contentMap[activeCategory] : null;
   const activeLabel = categories.find((c) => c.id === activeCategory)?.label ?? "";
@@ -439,9 +339,20 @@ export function Setting() {
         {/* Sidebar */}
         <aside className="w-75 shrink-0 flex flex-col border-r" style={{ borderColor: "var(--ff-border)", backgroundColor: "var(--ff-surface)" }}>
           {/* Sidebar Header */}
-          <div className="px-6 pt-8 pb-4">
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Settings</h1>
-            <p className="text-xs text-gray-900/40 dark:text-white/30 mt-1">Manage your preferences</p>
+          <div className="px-6 pt-8 pb-4 flex items-start justify-between gap-4">
+            <div>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Settings</h1>
+              <p className="text-xs text-gray-900/40 dark:text-white/30 mt-1">Manage your preferences</p>
+            </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={handleClose}
+              className="rounded-2xl text-gray-900/55 hover:text-gray-900 dark:text-white/55 dark:hover:text-white"
+            >
+              <X size={18} />
+            </Button>
           </div>
           {/* Category List */}
           <nav className="flex-1 overflow-y-auto px-3 pb-6 space-y-1">
@@ -508,8 +419,21 @@ export function Setting() {
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           >
             <div className="px-5 pt-14 pb-3">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Settings</h1>
-              <p className="text-xs text-gray-900/40 dark:text-white/30 mt-1">Manage your preferences</p>
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">Settings</h1>
+                  <p className="text-xs text-gray-900/40 dark:text-white/30 mt-1">Manage your preferences</p>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleClose}
+                  className="rounded-2xl shrink-0 text-gray-900/55 hover:text-gray-900 dark:text-white/55 dark:hover:text-white"
+                >
+                  <X size={18} />
+                </Button>
+              </div>
             </div>
             <div className="divide-y" style={{ borderColor: "var(--ff-border)" }}>
               {categories.map((cat, i) => (
