@@ -24,6 +24,7 @@ import {
 import { FaAngleLeft } from "react-icons/fa";
 import { Button } from "./ui/button";
 import { Switch } from "./ui/switch";
+import { supportedLanguages } from "@/i18n";
 
 /* ─────────────────────────── Types ─────────────────────────── */
 
@@ -99,12 +100,15 @@ function GeneralContent() {
   const [autoStart, setAutoStart] = useState(true);
   const [analytics, setAnalytics] = useState(false);
   const [timeFormat, setTimeFormat] = useState("24-hour");
-  const activeLanguage = i18n.resolvedLanguage === "vi" ? "vi" : "en";
+  const activeLanguage = (i18n.resolvedLanguage ?? i18n.language ?? "en").split("-")[0];
+  const displayNames = typeof Intl.DisplayNames === "function"
+    ? new Intl.DisplayNames([activeLanguage], { type: "language" })
+    : null;
 
-  const languageOptions = [
-    { code: "en", label: t("settings.general.language_values.en") },
-    { code: "vi", label: t("settings.general.language_values.vi") },
-  ] as const;
+  const languageOptions = supportedLanguages.map((code) => ({
+    code,
+    label: displayNames?.of(code) ?? code.toUpperCase(),
+  }));
 
   return (
     <div>

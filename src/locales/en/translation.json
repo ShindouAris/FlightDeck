@@ -82,7 +82,8 @@
             "time_format": "Time format",
             "language_values": {
                 "en": "English",
-                "vi": "Vietnamese"
+                "vi": "Vietnamese",
+                "ja": "Japanese"
             }
         },
         "analytics": {

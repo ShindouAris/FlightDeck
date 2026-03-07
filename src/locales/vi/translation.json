@@ -105,7 +105,8 @@
             "time_format": "Định dạng thời gian",
             "language_values": {
                 "en": "Tiếng Anh",
-                "vi": "Tiếng Việt"
+                "vi": "Tiếng Việt",
+                "ja": "Tiếng Nhật"
             }
         },
         "analytics": {

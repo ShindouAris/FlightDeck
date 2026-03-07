@@ -4,25 +4,31 @@ import LanguageDetector from "i18next-browser-languagedetector"
 
 import en from "./locales/en/translation.json"
 import vi from "./locales/vi/translation.json"
+import ja from "./locales/ja/translation.json"
+
+export const translationResources = {
+  en: { translation: en },
+  vi: { translation: vi },
+  ja: { translation: ja }
+} as const
+
+export const supportedLanguages = Object.keys(translationResources)
 
 i18n
 .use(initReactI18next)
 .use(LanguageDetector)
 .init({
   fallbackLng: "en",
-  supportedLngs: ["en", "vi"],
+  supportedLngs: supportedLanguages,
   load: "languageOnly",
   detection: {
     order: ["querystring", "localStorage", "navigator", "htmlTag"],
     caches: ["localStorage"],
   },
-    resources: {
-    en: { translation: en },
-    vi: { translation: vi },
-    },
-    interpolation: {
-      escapeValue: false
-    }
+  resources: translationResources,
+  interpolation: {
+    escapeValue: false
+  }
 })
 
 export default i18n

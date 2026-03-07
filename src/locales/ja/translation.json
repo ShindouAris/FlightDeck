@@ -1,0 +1,132 @@
+{
+    "welcome": "ご搭乗ありがとうございます",
+    "welcome_subtitle": "本日はどちらへ向かわれますか？",
+    "buttons": {
+        "book_flight": "フライトを予約",
+        "settings": "設定"
+    },
+    "departing": "出発",
+    "focus": {
+        "errors": {
+            "same_airport": "出発空港と到着空港を同じにすることはできません。",
+            "geolocation_unsupported": "このブラウザは位置情報に対応していません。",
+            "geolocation_error": "位置情報の取得中にエラーが発生しました:",
+            "select_both_airports": "フォーカスフライトを開始するには、出発空港と到着空港の両方を選択してください。",
+            "unable_to_start": "フォーカスフライトを開始できませんでした。"
+        },
+        "hints": {
+            "click_set_departure": "マーカーをクリックして出発空港を設定してください",
+            "click_set_arrival": "マーカーをクリックして到着空港を設定してください"
+        },
+        "buttons": {
+            "set_destination": "目的地を設定",
+            "go": "開始",
+            "print_boarding": "搭乗券を印刷",
+            "select_seat_continue": "座席を選択して続行"
+        },
+        "cover": {
+            "boarding_title": "キャビンドアが閉まりました",
+            "boarding_subtitle": "離陸準備完了",
+            "booking_title": "ご搭乗ありがとうございます",
+            "booking_subtitle": "本日はどちらへ向かわれますか？"
+        },
+        "ui": {
+            "departing_from": "出発地",
+            "focus_duration": "集中時間",
+            "landing_at": "着陸予定時刻:",
+            "min": "分",
+            "min_short": "5分",
+            "max_short": "15時間",
+            "choose_your_seat": "座席を選択",
+            "hold_to_end_focus": "長押しして集中セッションを終了",
+            "hold_to_end_flight": "長押ししてフライトを終了"
+        },
+        "ticket": {
+            "phases": {
+                "printing": {
+                    "title": "搭乗券を印刷中",
+                    "desc": "選択したモードに合わせて座席を準備しています。"
+                },
+                "printed": {
+                    "title": "搭乗券の準備ができました",
+                    "desc": "チェックインして搭乗券の切り取り線を有効にしてください。"
+                },
+                "tear-ready": {
+                    "title": "チェックイン完了",
+                    "desc": "搭乗券の半券を切り取って最終搭乗ステップを表示します。"
+                },
+                "board-ready": {
+                    "title": "搭乗ゲート準備完了",
+                    "desc": "搭乗を開始してください。離陸前にキャビンカバーが閉じます。"
+                }
+            }
+        },
+        "dialog": {
+            "flight_ended_title": "フォーカスフライトが終了しました",
+            "flight_ended_desc": "集中セッションが完了しました。新しいセッションを作成しますか、それともメイン画面に戻りますか？",
+            "exit_main": "メイン画面へ戻る",
+            "create_another": "新しいセッションを作成"
+        }
+    },
+    "settings": {
+        "title": "設定",
+        "manage_prefs": "設定を管理",
+        "select_setting": "設定項目を選択してください",
+        "footer_version": "FocusFlight v0.0.1",
+        "categories": {
+            "general": {
+                "label": "一般",
+                "description": "アプリの動作と言語"
+            },
+            "appearance": {
+                "label": "外観",
+                "description": "テーマ・色・表示"
+            },
+            "notifications": {
+                "label": "通知",
+                "description": "アラートとサウンド"
+            },
+            "about": {
+                "label": "情報",
+                "description": "バージョンとクレジット"
+            }
+        },
+        "sections": {
+            "behavior": "動作",
+            "analytics": "分析",
+            "theme": "テーマ",
+            "credits": "クレジット"
+        },
+        "general": {
+            "launch_on_startup": "起動時にアプリを開始",
+            "launch_on_startup_desc": "システム起動時にアプリを自動で開きます",
+            "language": "言語",
+            "language_desc": "アプリの表示言語を選択",
+            "time_format": "時間形式",
+            "language_values": {
+                "en": "英語",
+                "vi": "ベトナム語",
+                "ja": "日本語"
+            }
+        },
+        "analytics": {
+            "usage_analytics": "利用分析",
+            "usage_analytics_desc": "アプリ体験の改善に役立ちます"
+        },
+        "notifications": {
+            "push_notifications": "プッシュ通知",
+            "push_desc": "リアルタイムで更新を受信",
+            "sounds": "通知サウンド",
+            "sounds_desc": "アラート時にサウンドを再生"
+        },
+        "appearance": {
+            "dark": "ダーク",
+            "light": "ライト",
+            "system": "システム設定に従う"
+        },
+        "about": {
+            "built_with": "React、Mapbox GL、Framer Motion を使用して構築されています。",
+            "map_credits": "地図データ © OpenStreetMap contributors."
+        }
+    }
+}
