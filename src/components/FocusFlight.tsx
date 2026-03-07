@@ -245,6 +245,7 @@ export function FocusFlight() {
             return
         }
 
+        setBookingStep("ready")
         setScreenCoverMode("boarding")
     }
 
@@ -278,17 +279,12 @@ export function FocusFlight() {
     }, [bookingStep, ticketPhase, TICKET_PRINT_DURATION])
 
     useEffect(() => {
-        if (!screenCoverMode) {
+        if (screenCoverMode !== "booking") {
             return
         }
 
         const timeout = window.setTimeout(() => {
-            if (screenCoverMode === "booking") {
-                setBookingStep("select-departure")
-            } else {
-                setBookingStep("ready")
-            }
-
+            setBookingStep("select-departure")
             setScreenCoverMode(null)
         }, SCREEN_COVER_DURATION)
 
@@ -353,17 +349,32 @@ export function FocusFlight() {
         if (isPlaying) return
         if (route.length < 2) {
             gooeyToast.error("Please select both Departure and Arrival airports to start the Focus Flight.")
-            return
+            return false
         }
-        await document.documentElement.requestFullscreen()
-        const audio = new Audio("/seatbelt.mp3")
-        audio.volume = 0.65
-        audio.play()
-        toggle()
-        const IntervalID = setInterval(() => {
-            setActionBarOpen(false)
-            clearInterval(IntervalID)
-        }, 3000)
+        try {
+            await document.documentElement.requestFullscreen()
+            const audio = new Audio("/seatbelt.mp3")
+            audio.volume = 0.65
+            void audio.play()
+            toggle()
+            const IntervalID = setInterval(() => {
+                setActionBarOpen(false)
+                clearInterval(IntervalID)
+            }, 3000)
+            return true
+        } catch (error) {
+            console.error("Error starting focus flight:", error)
+            gooeyToast.error("Unable to start the focus flight.")
+            return false
+        }
+    }
+
+    const handleGoFromBoardingCover = async () => {
+        const hasStarted = await handleGo()
+
+        if (hasStarted) {
+            setScreenCoverMode(null)
+        }
     }
 
 
@@ -722,57 +733,6 @@ export function FocusFlight() {
         )}
         </AnimatePresence>
 
-        {/* ─── READY: Summary card + "Go" button ────────────────────── */}
-        {bookingStep === "ready" && selectedDpAirport && selectedArAirport && !isPlaying && !showFlightEndedDialog && (
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 w-full max-w-md px-4">
-                <div className="bg-black/80 backdrop-blur-2xl border border-white/10 rounded-3xl p-5
-                                shadow-[0_-20px_80px_rgba(0,0,0,0.5)] space-y-4">
-                    {/* Route summary */}
-                    <div className="flex items-stretch gap-3">
-                        <div className="flex flex-col items-center gap-0.5 pt-1.5 pb-1.5">
-                            <div className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
-                            <div className="w-px flex-1 bg-white/10 my-1" />
-                            <div className="w-2 h-2 rounded-full bg-violet-400 shrink-0" />
-                        </div>
-                        <div className="flex-1 space-y-3 min-w-0">
-                            <div>
-                                <p className="text-white/30 text-[10px] uppercase tracking-widest font-semibold">Departure</p>
-                                <p className="text-white/80 text-sm font-semibold truncate">
-                                    {selectedDpAirport.iata_code || selectedDpAirport.ident} · {selectedDpAirport.name}
-                                </p>
-                            </div>
-                            <div>
-                                <p className="text-white/30 text-[10px] uppercase tracking-widest font-semibold">Arrival</p>
-                                <p className="text-white/80 text-sm font-semibold truncate">
-                                    {selectedArAirport.iata_code || selectedArAirport.ident} · {selectedArAirport.name}
-                                </p>
-                            </div>
-                        </div>
-                        <div className="pl-3 ml-1 border-l border-white/[0.07] flex flex-col justify-center items-end shrink-0">
-                            <p className="text-white/30 text-[10px] uppercase tracking-widest font-semibold">Focus</p>
-                            <p className="text-amber-400 text-xl font-bold tabular-nums">
-                                {draftFocusMinutes}<span className="text-white/30 text-xs font-normal ml-0.5">m</span>
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="h-px bg-white/[0.07]" />
-
-                    {/* Go */}
-                    <button
-                        onClick={handleGo}
-                        className="w-full py-3.5 rounded-xl font-semibold text-base flex items-center justify-center gap-2.5
-                                   bg-emerald-500/15 border border-emerald-400/30 text-emerald-100
-                                   hover:bg-emerald-500/25 hover:border-emerald-400/50
-                                   transition-all duration-200"
-                    >
-                        <RiPlaneFill className="text-emerald-300 text-lg" />
-                        Go
-                    </button>
-                </div>
-            </div>
-        )}
-
         <AnimatePresence>
         {screenCoverMode && (
             <motion.div
@@ -802,6 +762,16 @@ export function FocusFlight() {
                         {coverCopy.title}
                     </p>
                     <p className="mt-3 text-lg font-light text-blue-200/85 sm:text-xl">{coverCopy.subtitle}</p>
+                    {screenCoverMode === "boarding" && (
+                        <Button
+                            type="button"
+                            className="mt-8 h-12 w-22 rounded-full bg-emerald-500 px-8 text-black hover:bg-emerald-400"
+                            onClick={handleGoFromBoardingCover}
+                        >
+                            <RiPlaneFill className="mr-2 text-lg" />
+                            Go
+                        </Button>
+                    )}
                 </motion.div>
             </motion.div>
         )}
