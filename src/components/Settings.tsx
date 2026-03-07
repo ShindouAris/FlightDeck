@@ -16,12 +16,11 @@ import {
   Eye,
   Volume2,
   VolumeX,
-  HelpCircle,
-  ExternalLink,
   Monitor,
   Clock,
   X,
 } from "lucide-react";
+import { FaAngleLeft } from "react-icons/fa";
 import { Button } from "./ui/button";
 import { Switch } from "./ui/switch";
 
@@ -341,18 +340,18 @@ export function Setting({ onClose }: SettingProps = {}) {
           {/* Sidebar Header */}
           <div className="px-6 pt-8 pb-4 flex items-start justify-between gap-4">
             <div>
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Settings</h1>
-              <p className="text-xs text-gray-900/40 dark:text-white/30 mt-1">Manage your preferences</p>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={handleClose}
+                className="rounded-2xl text-gray-900/55 hover:text-gray-900 dark:text-white/55 dark:hover:text-white"
+              >
+                <FaAngleLeft size={18} />
+              </Button>
+              <span className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Settings</span>
+              <div className="text-xs text-gray-900/40 dark:text-white/30 mt-1">Manage your preferences</div>
             </div>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={handleClose}
-              className="rounded-2xl text-gray-900/55 hover:text-gray-900 dark:text-white/55 dark:hover:text-white"
-            >
-              <X size={18} />
-            </Button>
           </div>
           {/* Category List */}
           <nav className="flex-1 overflow-y-auto px-3 pb-6 space-y-1">
