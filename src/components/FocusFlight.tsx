@@ -30,7 +30,7 @@ import Setting from "./Settings";
 import { IoSettingsOutline } from "react-icons/io5";
 import Counter from "./ui/Counter";
 import { useTranslation } from "react-i18next";
-
+import {navigationMapStyles, satelliteMapStyles} from "./ui/map/types";
 const MAPBOX_ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 const HAS_MAPBOX_TOKEN = Boolean(MAPBOX_ACCESS_TOKEN);
 
@@ -472,7 +472,7 @@ export function FocusFlight() {
         {/* ─── Map (always at base) ─────────────────────────────────── */}
         <Map
             accessToken={MAPBOX_ACCESS_TOKEN}
-            styles={HAS_MAPBOX_TOKEN ? undefined : FALLBACK_STYLES}
+            styles={HAS_MAPBOX_TOKEN ? satelliteMapStyles : FALLBACK_STYLES}
             center={currentLocation ? currentLocation[0] : [106.7009, 10.7769]}
             pitch={0}
             zoom={12}
@@ -846,8 +846,8 @@ export function FocusFlight() {
                 <button
                     className={`relative overflow-hidden flex items-center gap-2.5 px-5 py-2.5 rounded-full backdrop-blur-xl border transition-all duration-200 text-sm font-medium
                         ${isHoldingStop
-                            ? "bg-black/70 border-red-400/40 text-red-300"
-                            : "bg-black/60 border-white/10 text-white/50 hover:text-white/70 hover:border-white/20"}`}
+                            ? "bg-white/70 border-red-400/30 text-red-500 dark:bg-black/70 dark:border-red-400/50 dark:text-red-400"
+                            : "bg-white/60 border-white/10 text-black/50 hover:text-black/70 hover:border-black/20 dark:bg-black/50 dark:border-white/5 dark:text-white/40 dark:hover:text-white/70 dark:hover:border-white/20 backdrop-blur-md"}`}
                     onMouseDown={startHoldToStop}
                     onMouseUp={cancelHoldToStop}
                     onMouseLeave={cancelHoldToStop}
