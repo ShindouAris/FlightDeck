@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Popover, PopoverContent } from "./ui/animate-ui/components/radix/popover";
 import { PopoverTrigger } from "./ui/animate-ui/primitives/radix/popover";
 import { FaSpa } from "react-icons/fa";
-import { FiMonitor, FiBookOpen, FiActivity, FiPlus, FiCode } from "react-icons/fi";
+import { FiMonitor, FiBookOpen, FiActivity, FiCode } from "react-icons/fi";
 import { MdSelfImprovement } from "react-icons/md";
 
 type SeatData = {
@@ -133,10 +133,10 @@ function Seat({
     "w-12 h-12 sm:w-13 sm:h-13 md:w-15 md:h-15 rounded-lg border transition-all duration-150 flex items-center justify-center relative text-[10px] font-mono tracking-wider";
 
   const stateStyle = isSelected
-    ? "bg-white/90 border-white/70 text-slate-900 shadow-[0_0_16px_rgba(255,255,255,0.25)]"
+    ? "border-slate-900/80 bg-slate-900 text-white shadow-[0_10px_24px_rgba(15,23,42,0.22)] dark:border-white/70 dark:bg-white/90 dark:text-slate-900 dark:shadow-[0_0_16px_rgba(255,255,255,0.25)]"
     : isTaken
-    ? "bg-[#0d1018] border-[#1a1e28] text-[#2a2f3d] cursor-not-allowed opacity-40"
-    : "bg-[#1c2235] border-[#2d3a52] text-[#4a5878] hover:bg-[#232c44] hover:border-[#3d4e6a] cursor-pointer";
+    ? "cursor-not-allowed border-slate-300/90 bg-slate-200/95 text-slate-400 opacity-55 dark:border-[#1a1e28] dark:bg-[#0d1018] dark:text-[#2a2f3d] dark:opacity-40"
+    : "cursor-pointer border-slate-300 bg-white text-slate-500 shadow-[0_6px_16px_rgba(148,163,184,0.12)] hover:border-slate-400 hover:bg-slate-50 hover:text-slate-700 dark:border-[#2d3a52] dark:bg-[#1c2235] dark:text-[#4a5878] dark:shadow-none dark:hover:border-[#3d4e6a] dark:hover:bg-[#232c44]";
 
   return (
     <Popover open={open} onOpenChange={(open) => !isTaken && setOpen(open)}>
@@ -151,7 +151,7 @@ function Seat({
             : null
           }
           {seat.isExit && !isTaken && (
-            <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-orange-400/80 rounded-full" />
+            <span className="absolute -top-0.5 -right-0.5 h-1.5 w-1.5 rounded-full bg-orange-500/80 dark:bg-orange-400/80" />
           )}
         </button>
       </PopoverTrigger>
@@ -159,22 +159,21 @@ function Seat({
         side="bottom"
         sideOffset={10}
         collisionPadding={16}
-        className="w-72 p-4 border border-white/8 rounded-2xl shadow-2xl"
-        style={{ background: "rgba(18, 22, 36, 0.96)", backdropFilter: "blur(16px)" }}
+        className="w-72 rounded-2xl border border-slate-900/8 bg-white/95 p-4 shadow-[0_22px_55px_rgba(15,23,42,0.18)] backdrop-blur-xl dark:border-white/8 dark:bg-[rgba(18,22,36,0.96)] dark:shadow-2xl"
         initial={{ opacity: 0, y: 14, scale: 0.94 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 8, scale: 0.97 }}
         transition={{ type: "spring", stiffness: 380, damping: 28 }}
       >
-        <p className="text-[11px] font-mono text-slate-500 mb-1">Seat: {seat.id}</p>
-        <h3 className="text-sm font-semibold text-white mb-4 leading-snug">
+        <p className="mb-1 text-[11px] font-mono text-slate-500 dark:text-slate-500">Seat: {seat.id}</p>
+        <h3 className="mb-4 text-sm font-semibold leading-snug text-slate-900 dark:text-white">
           What do you want to focus?
         </h3>
         <div className="grid grid-cols-3 gap-2">
           {focusActivities.map((act) => (
             <button
               key={act.id}
-              className="flex items-center gap-1.5 px-2.5 py-2 rounded-full bg-white/6 hover:bg-white/12 border border-white/8 text-slate-300 hover:text-white text-xs font-mono transition-all duration-150 select-none"
+              className="select-none rounded-full border border-slate-200 bg-slate-100 px-2.5 py-2 text-xs font-mono text-slate-600 transition-all duration-150 hover:border-slate-300 hover:bg-slate-200 hover:text-slate-900 dark:border-white/8 dark:bg-white/6 dark:text-slate-300 dark:hover:bg-white/12 dark:hover:text-white"
               onClick={() => {
                 onSelect(seat, act);
                 setOpen(false);
@@ -241,44 +240,36 @@ export default function SeatSelection({ onSeatSelect }: { onSeatSelect?: (choice
 
   return (
     <div
-      className="min-h-screen flex flex-col lg:flex-row gap-0"
+      className="min-h-screen flex flex-col gap-0 lg:flex-row"
       style={{
         fontFamily: "'DM Mono', 'Courier New', monospace",
       }}
     >
       {/* Plane map */}
-      <div className="flex-1 flex flex-col items-center py-10 px-4 overflow-y-auto bg-black/5 backdrop:backdrop-blur-lg">
+      <div className="flex flex-1 flex-col items-center overflow-y-auto bg-white/16 px-4 py-10 shadow-[inset_0_1px_0_rgba(255,255,255,0.38)] backdrop-blur-lg dark:bg-black/5 dark:shadow-none">
 
         {/* Plane body */}
         <div
-          className="relative w-full max-w-70 sm:max-w-xs md:max-w-sm"
-          style={{ filter: "drop-shadow(0 0 40px rgba(0,0,0,0.8))" }}
+          className="relative w-full max-w-70 drop-shadow-[0_22px_40px_rgba(148,163,184,0.28)] dark:drop-shadow-[0_0_40px_rgba(0,0,0,0.8)] sm:max-w-xs md:max-w-sm"
         >
 
           {/* Fuselage body */}
           <div
-            className="w-full px-5 sm:px-6 pb-50 pt-7 rounded-full"
-            style={{
-              background: "#0e1220",
-              borderLeft: "1px solid #1e2840",
-              borderRight: "1px solid #1e2840",
-            }}
+            className="w-full rounded-full border-x border-slate-300/90 bg-slate-100 px-5 pt-7 pb-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] dark:border-x-[#1e2840] dark:bg-[#0e1220] dark:shadow-none sm:px-6"
           >
             {/* Cockpit / Nose section */}
             <div className="flex flex-col items-center gap-1.5 pt-4 pb-6 mb-3">
-              <div className="w-8 h-8 rounded-full flex items-center justify-center"
-                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid #1e2840" }}>
+              <div className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-300 bg-white/80 dark:border-[#1e2840] dark:bg-white/4">
               </div>
-              <span className="text-[8px] font-mono tracking-[0.35em] uppercase"
-                style={{ color: "#1e2840" }}>cockpit</span>
-              <div className="w-16 h-px mt-1" style={{ background: "linear-gradient(to right, transparent, #1e2840, transparent)" }} />
+              <span className="text-[8px] font-mono uppercase tracking-[0.35em] text-slate-400 dark:text-[#1e2840]">cockpit</span>
+              <div className="mt-1 h-px w-16 bg-[linear-gradient(to_right,transparent,rgba(148,163,184,0.9),transparent)] dark:bg-[linear-gradient(to_right,transparent,#1e2840,transparent)]" />
             </div>
 
             {/* First Class column headers */}
             <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3">
               <div className="flex gap-1 sm:gap-1.5">
                 {["A", "B"].map((c) => (
-                  <div key={c} className="w-9 sm:w-10 md:w-11 text-center text-[9px] text-[#2d3748] font-mono tracking-widest">
+                  <div key={c} className="w-9 text-center font-mono text-[9px] tracking-widest text-slate-400 dark:text-[#2d3748] sm:w-10 md:w-11">
                     {c}
                   </div>
                 ))}
@@ -286,7 +277,7 @@ export default function SeatSelection({ onSeatSelect }: { onSeatSelect?: (choice
               <div className="w-8 sm:w-10 md:w-12" />
               <div className="flex gap-1 sm:gap-1.5">
                 {["C", "D"].map((c) => (
-                  <div key={c} className="w-10 sm:w-13 md:w-15 text-center text-[9px] text-[#2d3748] font-mono tracking-widest">
+                  <div key={c} className="w-10 text-center font-mono text-[9px] tracking-widest text-slate-400 dark:text-[#2d3748] sm:w-13 md:w-15">
                     {c}
                   </div>
                 ))}
@@ -300,16 +291,16 @@ export default function SeatSelection({ onSeatSelect }: { onSeatSelect?: (choice
 
             {/* Galley divider */}
             <div className="my-4 flex items-center gap-3 justify-center">
-              <div className="h-px flex-1" style={{ background: "linear-gradient(to right, transparent, #1e2840)" }} />
-              <span className="text-[8px] font-mono text-[#1e2840] tracking-[0.3em] uppercase">galley</span>
-              <div className="h-px flex-1" style={{ background: "linear-gradient(to left, transparent, #1e2840)" }} />
+              <div className="h-px flex-1 bg-[linear-gradient(to_right,transparent,rgba(148,163,184,0.9))] dark:bg-[linear-gradient(to_right,transparent,#1e2840)]" />
+              <span className="text-[8px] font-mono uppercase tracking-[0.3em] text-slate-400 dark:text-[#1e2840]">galley</span>
+              <div className="h-px flex-1 bg-[linear-gradient(to_left,transparent,rgba(148,163,184,0.9))] dark:bg-[linear-gradient(to_left,transparent,#1e2840)]" />
             </div>
 
             {/* Business class column headers */}
             <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3">
               <div className="flex gap-1 sm:gap-1.5">
                 {["A", "B"].map((c) => (
-                  <div key={c} className="w-9 sm:w-10 md:w-11 text-center text-[9px] text-[#2d3748] font-mono tracking-widest">
+                  <div key={c} className="w-9 text-center font-mono text-[9px] tracking-widest text-slate-400 dark:text-[#2d3748] sm:w-10 md:w-11">
                     {c}
                   </div>
                 ))}
@@ -317,7 +308,7 @@ export default function SeatSelection({ onSeatSelect }: { onSeatSelect?: (choice
               <div className="w-8 sm:w-10 md:w-12" />
               <div className="flex gap-1 sm:gap-1.5">
                 {["C", "D"].map((c) => (
-                  <div key={c} className="w-10 sm:w-13 md:w-15 text-center text-[9px] text-[#2d3748] font-mono tracking-widest">
+                  <div key={c} className="w-10 text-center font-mono text-[9px] tracking-widest text-slate-400 dark:text-[#2d3748] sm:w-13 md:w-15">
                     {c}
                   </div>
                 ))}
@@ -331,9 +322,9 @@ export default function SeatSelection({ onSeatSelect }: { onSeatSelect?: (choice
 
             {/* Galley divider */}
             <div className="my-4 flex items-center gap-3 justify-center">
-              <div className="h-px flex-1" style={{ background: "linear-gradient(to right, transparent, #1e2840)" }} />
-              <span className="text-[8px] font-mono text-[#1e2840] tracking-[0.3em] uppercase">galley</span>
-              <div className="h-px flex-1" style={{ background: "linear-gradient(to left, transparent, #1e2840)" }} />
+              <div className="h-px flex-1 bg-[linear-gradient(to_right,transparent,rgba(148,163,184,0.9))] dark:bg-[linear-gradient(to_right,transparent,#1e2840)]" />
+              <span className="text-[8px] font-mono uppercase tracking-[0.3em] text-slate-400 dark:text-[#1e2840]">galley</span>
+              <div className="h-px flex-1 bg-[linear-gradient(to_left,transparent,rgba(148,163,184,0.9))] dark:bg-[linear-gradient(to_left,transparent,#1e2840)]" />
             </div>
 
             {/* Economy */}

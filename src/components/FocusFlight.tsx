@@ -666,10 +666,10 @@ export function FocusFlight() {
         {/* ─── SELECT SEAT: Full-screen seat selection overlay ──────── */}
         <AnimatePresence>
         {bookingStep === "select-seat" && (
-            <>
+            <div className="absolute inset-0 z-20 bg-black/45 flex items-end justify-center px-4">
                 {/* Blurred backdrop */}
                 <motion.div
-                    className="absolute inset-0 z-20 backdrop-blur-md bg-transparent"
+                    className="absolute inset-0 z-20 backdrop-blur-sm bg-transparent"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
@@ -678,7 +678,7 @@ export function FocusFlight() {
 
                 {/* Slide-up panel */}
                 <motion.div
-                    className="absolute inset-x-0 bottom-0 top-0 z-30 flex flex-col overflow-hidden"
+                    className="absolute inset-x-0 bottom-0 top-0 z-30 flex flex-col overflow-hidden backdrop-blur-md"
                     initial={{ y: "100%" }}
                     animate={{ y: 0 }}
                     exit={{ y: "-100%" }}
@@ -688,7 +688,7 @@ export function FocusFlight() {
                     <div className="absolute top-5 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
                         <div className="flex items-center gap-2.5 px-5 py-2.5 rounded-full backdrop-blur-xl border border-white/10 shadow-lg">
                             <span className="w-2 h-2 rounded-full shrink-0 animate-pulse bg-blue-400" />
-                            <span className="text-white/80 text-sm font-medium whitespace-nowrap">{t("focus.ui.choose_your_seat")}</span>
+                            <span className="text-dark/80 dark:text-white/80 text-sm font-medium whitespace-nowrap">{t("focus.ui.choose_your_seat")}</span>
                         </div>
                     </div>
 
@@ -713,7 +713,7 @@ export function FocusFlight() {
                         </button>
                     </div>
                 </motion.div>
-            </>
+            </div>
         )}
         </AnimatePresence>
 
@@ -828,7 +828,7 @@ export function FocusFlight() {
                     {screenCoverMode === "boarding" && (
                         <Button
                             type="button"
-                            className="mt-8 h-12 w-22 rounded-full bg-emerald-500 px-8 text-black hover:bg-emerald-400"
+                            className="mt-8 h-12 w-25 rounded-full bg-emerald-500 px-8 text-black hover:bg-emerald-400"
                             onClick={handleGoFromBoardingCover}
                         >
                             <RiPlaneFill className="mr-2 text-lg" />
