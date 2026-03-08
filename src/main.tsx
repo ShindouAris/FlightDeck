@@ -5,7 +5,7 @@ import App from './App.tsx'
 import { GooeyToaster } from 'goey-toast'
 import "goey-toast/styles.css"
 import './i18n.ts'
-import { Analytics } from "@vercel/analytics/next"
+import { Analytics } from "@vercel/analytics/react"
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
