@@ -88,6 +88,10 @@
                 "label": "Giao diện",
                 "description": "Chủ đề, màu sắc & hiển thị"
             },
+            "map": {
+                "label": "Tùy chọn bản đồ",
+                "description": "Diện mạo bản đồ & màu đường bay"
+            },
             "notifications": {
                 "label": "Thông báo",
                 "description": "Cảnh báo & âm thanh"
@@ -101,6 +105,7 @@
             "behavior": "Hành vi",
             "analytics": "Phân tích",
             "theme": "Chủ đề",
+            "map": "Bản đồ",
             "credits": "Ghi nhận"
         },
         "general": {
@@ -129,6 +134,31 @@
             "dark": "Tối",
             "light": "Sáng",
             "system": "Theo hệ thống"
+        },
+        "map_options": {
+            "map_appearance": "Diện mạo bản đồ",
+            "select_map_appearance": "Chọn",
+            "dialog_title": "Chọn kiểu bản đồ",
+            "dialog_desc": "Chuyển bản đồ trong chuyến bay giữa ảnh vệ tinh và phong cách điều hướng dễ đọc.",
+            "active": "Đang dùng",
+            "line_color": "Màu đường bay",
+            "line_color_desc": "Chọn màu nhấn cho đường bay khi đang tập trung.",
+            "route_preview": "Xem trước đường bay",
+            "route_preview_desc": "Xem nhanh đường bay sẽ hiển thị như thế nào trên bản đồ.",
+            "appearance_values": {
+                "satellite": "Vệ tinh",
+                "navigation": "Điều hướng"
+            },
+            "appearance_descriptions": {
+                "satellite": "Ảnh địa hình chi tiết kèm lớp đường sá để tạo cảm giác bay điện ảnh.",
+                "navigation": "Bản đồ sạch, tập trung vào tuyến đường để dễ quan sát khi bay."
+            },
+            "line_color_values": {
+                "amber": "Hổ phách",
+                "sky": "Xanh trời",
+                "emerald": "Ngọc lục bảo",
+                "rose": "Hồng"
+            }
         },
         "about": {
             "built_with": "Được xây dựng bằng React, Mapbox GL và Framer Motion.",

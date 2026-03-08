@@ -71,6 +71,7 @@
         "categories": {
             "general": { "label": "General", "description": "App behavior & language" },
             "appearance": { "label": "Appearance", "description": "Theme, colors & display" },
+            "map": { "label": "Map option", "description": "Map look & route accent" },
             "notifications": { "label": "Notifications", "description": "Alerts & sounds" },
             "about": { "label": "About", "description": "Version & credits" }
         },
@@ -78,6 +79,7 @@
             "behavior": "Behavior",
             "analytics": "Analytics",
             "theme": "Theme",
+            "map": "Map",
             "credits": "Credits"
         },
         "general": {
@@ -106,6 +108,31 @@
             "dark": "Dark",
             "light": "Light",
             "system": "System"
+        },
+        "map_options": {
+            "map_appearance": "Map appearance",
+            "select_map_appearance": "Select",
+            "dialog_title": "Choose a map style",
+            "dialog_desc": "Switch the in-flight map between satellite imagery and navigation-focused cartography.",
+            "active": "Active",
+            "line_color": "Line color",
+            "line_color_desc": "Choose the route accent shown during flight.",
+            "route_preview": "Route preview",
+            "route_preview_desc": "A quick look at how your route line will render over the map.",
+            "appearance_values": {
+                "satellite": "Satellite",
+                "navigation": "Navigation"
+            },
+            "appearance_descriptions": {
+                "satellite": "Rich terrain imagery with road overlays for a cinematic flyover.",
+                "navigation": "Clean route-focused cartography tuned for legibility during flight."
+            },
+            "line_color_values": {
+                "amber": "Amber",
+                "sky": "Sky",
+                "emerald": "Emerald",
+                "rose": "Rose"
+            }
         },
         "about": {
             "built_with": "Built with React, Mapbox GL, and Framer Motion.",

@@ -30,7 +30,7 @@ import Setting from "./Settings";
 import { IoSettingsOutline } from "react-icons/io5";
 import Counter from "./ui/Counter";
 import { useTranslation } from "react-i18next";
-import {navigationMapStyles, satelliteMapStyles} from "./ui/map/types";
+import { getMapAppearanceStyles, getMapLineColorValue, useMapSettings } from "../lib/map-settings";
 const MAPBOX_ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 const HAS_MAPBOX_TOKEN = Boolean(MAPBOX_ACCESS_TOKEN);
 
@@ -118,6 +118,7 @@ function MapFlightEndReturn({
 export function FocusFlight() {
     useWakeLock()
     const { t } = useTranslation()
+    const { settings: mapSettings } = useMapSettings()
 
     const getTimePeriod = (d: Date = new Date()) => {
         const h = d.getHours()
@@ -472,7 +473,7 @@ export function FocusFlight() {
         {/* ─── Map (always at base) ─────────────────────────────────── */}
         <Map
             accessToken={MAPBOX_ACCESS_TOKEN}
-            styles={HAS_MAPBOX_TOKEN ? satelliteMapStyles : FALLBACK_STYLES}
+            styles={HAS_MAPBOX_TOKEN ? getMapAppearanceStyles(mapSettings.appearance) : FALLBACK_STYLES}
             center={currentLocation ? currentLocation[0] : [106.7009, 10.7769]}
             pitch={0}
             zoom={12}
@@ -486,7 +487,7 @@ export function FocusFlight() {
             <MapFlightEndReturn currentLocation={currentLocation} trigger={flightEndReturnTrigger} />
             {route.length >= 2 && (
                 <>
-                    <MapLine coordinates={route} color="#facc15" width={3} />
+                    <MapLine coordinates={route} color={getMapLineColorValue(mapSettings.lineColor)} width={3} />
                     <MapCameraFollow
                         path={route}
                         autoStart={isPlaying}

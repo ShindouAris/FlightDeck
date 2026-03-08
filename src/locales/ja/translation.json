@@ -88,6 +88,10 @@
                 "label": "外観",
                 "description": "テーマ・色・表示"
             },
+            "map": {
+                "label": "マップ設定",
+                "description": "地図の見た目とルートカラー"
+            },
             "notifications": {
                 "label": "通知",
                 "description": "アラートとサウンド"
@@ -101,6 +105,7 @@
             "behavior": "動作",
             "analytics": "分析",
             "theme": "テーマ",
+            "map": "マップ",
             "credits": "クレジット"
         },
         "general": {
@@ -129,6 +134,31 @@
             "dark": "ダーク",
             "light": "ライト",
             "system": "システム設定に従う"
+        },
+        "map_options": {
+            "map_appearance": "マップの見た目",
+            "select_map_appearance": "選択",
+            "dialog_title": "マップスタイルを選択",
+            "dialog_desc": "機内マップを衛星画像表示とナビゲーション重視の表示で切り替えます。",
+            "active": "選択中",
+            "line_color": "ルートラインの色",
+            "line_color_desc": "フライト中に表示されるルートラインのアクセントカラーを選びます。",
+            "route_preview": "ルートプレビュー",
+            "route_preview_desc": "マップ上でルートラインがどのように見えるかを確認できます。",
+            "appearance_values": {
+                    "satellite": "衛星",
+                    "navigation": "ナビゲーション"
+            },
+            "appearance_descriptions": {
+                    "satellite": "道路オーバーレイ付きの地形画像で、シネマティックな飛行感を演出します。",
+                    "navigation": "可読性を重視した、ルート確認向けのクリーンな地図表示です。"
+            },
+            "line_color_values": {
+                    "amber": "アンバー",
+                    "sky": "スカイ",
+                    "emerald": "エメラルド",
+                    "rose": "ローズ"
+            }
         },
         "about": {
             "built_with": "React、Mapbox GL、Framer Motion を使用して構築されています。",

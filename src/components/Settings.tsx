@@ -9,6 +9,7 @@ import {
   Bell,
   Plane,
   Info,
+  Map as MapIcon,
   ChevronRight,
   ChevronLeft,
   Sun,
@@ -19,12 +20,26 @@ import {
   VolumeX,
   Monitor,
   Clock,
+  Check,
   X,
 } from "lucide-react";
 import { FaAngleLeft } from "react-icons/fa";
 import { Button } from "./ui/button";
 import { Switch } from "./ui/switch";
 import { supportedLanguages } from "@/i18n";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/animate-ui/components/radix/dialog";
+import {
+  MAP_LINE_COLOR_OPTIONS,
+  type MapAppearance,
+  getMapLineColorValue,
+  useMapSettings,
+} from "../lib/map-settings";
 
 /* ─────────────────────────── Types ─────────────────────────── */
 
@@ -40,6 +55,7 @@ interface SettingCategory {
 const categories: SettingCategory[] = [
   { id: "general", label: "General", icon: Settings, description: "App behavior & language" },
   { id: "appearance", label: "Appearance", icon: Palette, description: "Theme, colors & display" },
+  { id: "map", label: "Map option", icon: MapIcon, description: "Map look & route accent" },
   { id: "notifications", label: "Notifications", icon: Bell, description: "Alerts & sounds" },
   { id: "about", label: "About", icon: Info, description: "Version & credits" },
 ];
@@ -186,6 +202,162 @@ function AppearanceContent() {
   );
 }
 
+const mapAppearancePreviewSrc: Record<MapAppearance, string> = {
+  satellite: "/assets/preview/themes/satelliteMapStyles.png",
+  navigation: "/assets/preview/themes/navigationMapStyles.png",
+};
+
+function MapOptionsContent() {
+  const { t } = useTranslation();
+  const { settings, setMapSettings } = useMapSettings();
+  const [isAppearanceDialogOpen, setIsAppearanceDialogOpen] = useState(false);
+
+  const currentLineColor = getMapLineColorValue(settings.lineColor);
+
+  return (
+    <div>
+      <SectionTitle>{t("settings.sections.map")}</SectionTitle>
+      <SettingRow
+        icon={MapIcon}
+        label={t("settings.map_options.map_appearance")}
+        description={t(`settings.map_options.appearance_descriptions.${settings.appearance}`)}
+        trailing={(
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => setIsAppearanceDialogOpen(true)}
+            className="rounded-2xl border border-white/10 bg-white/5 px-4 text-xs font-semibold text-gray-900/65 hover:bg-white/10 dark:text-white/75"
+          >
+            {t("settings.map_options.select_map_appearance")}
+          </Button>
+        )}
+      />
+      <Divider />
+
+      <div className="px-1 py-5">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-sm font-medium text-gray-900/88 dark:text-white/90">{t("settings.map_options.line_color")}</p>
+            <p className="mt-0.5 text-xs text-gray-900/45 dark:text-white/40">{t("settings.map_options.line_color_desc")}</p>
+          </div>
+          <span
+            className="rounded-full px-3 py-1 text-xs font-semibold"
+            style={{
+              backgroundColor: `${currentLineColor}1A`,
+              color: currentLineColor,
+            }}
+          >
+            {t(`settings.map_options.line_color_values.${settings.lineColor}`)}
+          </span>
+        </div>
+
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {MAP_LINE_COLOR_OPTIONS.map((option) => {
+            const isActive = option.id === settings.lineColor;
+
+            return (
+              <button
+                key={option.id}
+                type="button"
+                onClick={() => setMapSettings({ lineColor: option.id })}
+                className="rounded-2xl border px-3 py-3 text-left transition-all duration-200"
+                style={{
+                  borderColor: isActive ? option.value : "var(--ff-border)",
+                  backgroundColor: isActive ? `${option.value}14` : "var(--ff-surface-mid)",
+                  boxShadow: isActive ? `0 12px 28px ${option.value}1F` : "none",
+                }}
+              >
+                <span className="mb-3 block h-2.5 rounded-full" style={{ backgroundColor: option.value }} />
+                <span className="text-xs font-semibold" style={{ color: isActive ? option.value : "var(--ff-label-inactive)" }}>
+                  {t(`settings.map_options.line_color_values.${option.id}`)}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="mt-4 rounded-[28px] border px-5 py-6" style={{ borderColor: "var(--ff-border)", backgroundColor: "var(--ff-surface-mid)" }}>
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-900/35 dark:text-white/30">
+                {t("settings.map_options.route_preview")}
+              </p>
+              <p className="mt-1 text-sm text-gray-900/60 dark:text-white/55">{t("settings.map_options.route_preview_desc")}</p>
+            </div>
+            <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-900/30 dark:text-white/25">A01</span>
+          </div>
+          <div className="relative mt-5 h-10 overflow-hidden rounded-full" style={{ backgroundColor: "var(--ff-surface-raised)" }}>
+            <div
+              className="absolute inset-x-4 top-1/2 h-1.5 -translate-y-1/2 rounded-full"
+              style={{
+                background: `linear-gradient(90deg, ${currentLineColor}35 0%, ${currentLineColor} 50%, ${currentLineColor}35 100%)`,
+              }}
+            />
+            <div className="absolute left-5 top-1/2 h-3 w-3 -translate-y-1/2 rounded-full bg-white shadow-[0_0_0_4px_rgba(255,255,255,0.08)]" />
+            <div
+              className="absolute right-6 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full border border-white/20"
+              style={{ backgroundColor: currentLineColor }}
+            />
+          </div>
+        </div>
+      </div>
+
+      <Dialog open={isAppearanceDialogOpen} onOpenChange={setIsAppearanceDialogOpen}>
+        <DialogContent className="max-w-4xl border-white/10 bg-[#0b1018]/95 text-white shadow-[0_24px_100px_rgba(0,0,0,0.45)] backdrop-blur-2xl">
+          <DialogHeader className="gap-2 text-left">
+            <DialogTitle className="text-xl font-semibold tracking-tight">{t("settings.map_options.dialog_title")}</DialogTitle>
+            <DialogDescription className="text-white/55">{t("settings.map_options.dialog_desc")}</DialogDescription>
+          </DialogHeader>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            {(["satellite", "navigation"] as const).map((appearance) => {
+              const isActive = appearance === settings.appearance;
+
+              return (
+                <button
+                  key={appearance}
+                  type="button"
+                  onClick={() => {
+                    setMapSettings({ appearance });
+                    setIsAppearanceDialogOpen(false);
+                  }}
+                  className="group rounded-[28px] border p-3 text-left transition-all duration-300"
+                  style={{
+                    borderColor: isActive ? "#A78BFA66" : "rgba(255,255,255,0.08)",
+                    background: isActive ? "linear-gradient(180deg, rgba(167,139,250,0.14) 0%, rgba(11,16,24,0.9) 100%)" : "rgba(255,255,255,0.03)",
+                    boxShadow: isActive ? "0 18px 44px rgba(167, 139, 250, 0.18)" : "none",
+                  }}
+                >
+                  <div className="relative overflow-hidden rounded-[22px] border border-white/8">
+                    <img
+                      src={mapAppearancePreviewSrc[appearance]}
+                      alt={t(`settings.map_options.appearance_values.${appearance}`)}
+                      className="aspect-16/10 w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                    />
+                    {isActive && (
+                      <div className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-black/60 px-2.5 py-1 text-[11px] font-semibold text-white shadow-lg">
+                        <Check size={12} />
+                        {t("settings.map_options.active")}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="px-1 pb-1 pt-4">
+                    <p className="text-sm font-semibold text-white">{t(`settings.map_options.appearance_values.${appearance}`)}</p>
+                    <p className="mt-1 text-xs leading-relaxed text-white/55">
+                      {t(`settings.map_options.appearance_descriptions.${appearance}`)}
+                    </p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
 function NotificationsContent() {
   const { t } = useTranslation();
   const [push, setPush] = useState(true);
@@ -225,6 +397,7 @@ function AboutContent() {
 const contentMap: Record<string, React.FC> = {
   general: GeneralContent,
   appearance: AppearanceContent,
+  map: MapOptionsContent,
   notifications: NotificationsContent,
   about: AboutContent,
 };
