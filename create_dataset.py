@@ -1,6 +1,10 @@
 import csv
 import json
 
+airport_file = "https://raw.githubusercontent.com/davidmegginson/ourairports-data/refs/heads/main/airports.csv"
+
+import urllib.request
+import pathlib
 keep_fields = {
     "id",
     "ident",
@@ -13,7 +17,12 @@ keep_fields = {
 
 result = []
 
-with open("./public/airports.csv", "r", encoding="utf-8") as f:
+# Download the airport file if it doesn't exist
+airport_path = pathlib.Path("./public/airports.csv")
+if not airport_path.exists():
+    urllib.request.urlretrieve(airport_file, airport_path)
+
+with open(airport_path, "r", encoding="utf-8") as f:
     reader = csv.DictReader(f)
 
     for row in reader:
