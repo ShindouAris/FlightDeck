@@ -11,8 +11,8 @@
             "same_airport": "Departure and Arrival cannot be the same airport!",
             "geolocation_unsupported": "Geolocation is not supported by this browser.",
             "geolocation_error": "Error getting geolocation:",
-            "select_both_airports": "Please select both Departure and Arrival airports to start the Focus Flight.",
-            "unable_to_start": "Unable to start the focus flight."
+            "select_both_airports": "Please select both Departure and Arrival airports to start the Flight.",
+            "unable_to_start": "Unable to start the flight."
         },
         "hints": {
             "click_set_departure": "Click a marker to set departure airport",
@@ -57,8 +57,8 @@
             }
         },
         "dialog": {
-            "flight_ended_title": "Focus flight ended",
-            "flight_ended_desc": "Your focus flight session is complete. Would you like to create another session or exit back to the main screen?",
+            "flight_ended_title": "Flight ended",
+            "flight_ended_desc": "Your flight session is complete. Would you like to create another session or exit back to the main screen?",
             "exit_main": "Exit to main screen",
             "create_another": "Create another session"
         }

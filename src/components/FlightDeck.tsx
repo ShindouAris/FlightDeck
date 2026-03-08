@@ -115,7 +115,7 @@ function MapFlightEndReturn({
     return null
 }
 
-export function FocusFlight() {
+export function FlightDeck() {
     useWakeLock()
     const { t } = useTranslation()
     const { settings: mapSettings } = useMapSettings()
@@ -389,7 +389,7 @@ export function FocusFlight() {
             }, 3000)
             return true
         } catch (error) {
-            console.error("Error starting focus flight:", error)
+            console.error("Error starting flight:", error)
             gooeyToast.error(t("focus.errors.unable_to_start"))
             return false
         }
@@ -821,7 +821,7 @@ export function FocusFlight() {
                     exit={{ opacity: 0, y: -24 }}
                     transition={{ duration: 0.45, delay: 0.2 }}
                 >
-                    <p className="text-xs font-semibold uppercase tracking-[0.6em] text-white/35">Focus Flight</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.6em] text-white/35">FlightDeck</p>
                     <p className="mt-5 text-4xl font-semibold uppercase tracking-[0.16em] text-emerald-300 sm:text-5xl">
                         {coverCopy.title}
                     </p>
