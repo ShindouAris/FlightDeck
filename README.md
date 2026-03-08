@@ -176,6 +176,10 @@ Translations live in `src/locales` and are wired through `src/i18n.ts`.
 - [ ] Export completed session summaries.
 - [ ] Add richer notification and sound behavior.
 
+## Credit
+
+- Airport data from https://ourairports.com
+
 ## License
 
 No license is defined yet.
