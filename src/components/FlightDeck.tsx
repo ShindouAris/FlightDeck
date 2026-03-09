@@ -556,7 +556,7 @@ export function FlightDeck() {
             <div className="absolute top-5 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
                 <div className="flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-black/65 backdrop-blur-xl border border-white/10 shadow-lg">
                     <span className={`w-2 h-2 rounded-full shrink-0 animate-pulse ${bookingStep === "select-departure" ? "bg-amber-400" : "bg-violet-400"}`} />
-                    <span className="text-white/80 text-sm font-medium whitespace-nowrap">
+                    <span className="text-white/80 text-[14px] lg:text-sm font-medium whitespace-nowrap">
                         {bookingStep === "select-departure"
                             ? t("focus.hints.click_set_departure")
                             : t("focus.hints.click_set_arrival")}
@@ -572,7 +572,7 @@ export function FlightDeck() {
                     <LuPlaneTakeoff className="text-emerald-400 text-base shrink-0" />
                     <div className="min-w-0">
                         <p className="text-white/35 text-[10px] uppercase tracking-widest font-semibold">Departing</p>
-                        <p className="text-white/75 text-sm font-semibold truncate">
+                        <p className="text-white/75 text-[14px] lg:text-sm font-semibold truncate overflow-hidden">
                             {selectedDpAirport.iata_code || selectedDpAirport.ident} · {selectedDpAirport.name}
                         </p>
                     </div>
