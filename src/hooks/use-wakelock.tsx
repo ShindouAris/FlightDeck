@@ -8,31 +8,64 @@ export const useWakeLock = (enabled: boolean) => {
 
     let wakeLock: WakeLockSentinel | null = null
     let isDisposed = false
+    let requestPromise: Promise<void> | null = null
+    let requestGeneration = 0
 
     const requestLock = async () => {
-      if (isDisposed || document.visibilityState !== "visible") {
+      if (isDisposed || document.visibilityState !== "visible" || wakeLock) {
         return
       }
 
-      try {
-        wakeLock = await navigator.wakeLock.request("screen")
-      } catch {
-        wakeLock = null
+      if (requestPromise) {
+        await requestPromise
+        return
       }
+
+      const generation = ++requestGeneration
+
+      requestPromise = (async () => {
+        try {
+          const nextWakeLock = await navigator.wakeLock.request("screen")
+
+          if (
+            isDisposed ||
+            document.visibilityState !== "visible" ||
+            generation !== requestGeneration
+          ) {
+            try {
+              await nextWakeLock.release()
+            } catch {
+              /* ignore release failures */
+            }
+            return
+          }
+
+          wakeLock = nextWakeLock
+        } catch {
+          wakeLock = null
+        } finally {
+          requestPromise = null
+        }
+      })()
+
+      await requestPromise
     }
 
     const releaseLock = async () => {
-      if (!wakeLock) {
+      requestGeneration += 1
+
+      const currentWakeLock = wakeLock
+      wakeLock = null
+
+      if (!currentWakeLock) {
         return
       }
 
       try {
-        await wakeLock.release()
+        await currentWakeLock.release()
       } catch {
-        wakeLock = null
+        /* ignore release failures */
       }
-
-      wakeLock = null
     }
 
     void requestLock()
