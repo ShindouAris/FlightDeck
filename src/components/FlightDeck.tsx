@@ -116,7 +116,8 @@ function MapFlightEndReturn({
 }
 
 export function FlightDeck() {
-    useWakeLock()
+    const {isPlaying, toggle, stop} = useCameraFollowControl()
+    useWakeLock(isPlaying)
     const { t } = useTranslation()
     const { settings: mapSettings } = useMapSettings()
 
@@ -230,8 +231,6 @@ export function FlightDeck() {
             console.error(t("focus.errors.geolocation_error"), error)
         })
     }
-
-    const {isPlaying, toggle, stop} = useCameraFollowControl()
 
     const handleBeginBooking = () => {
         setScreenCoverMode("booking")
